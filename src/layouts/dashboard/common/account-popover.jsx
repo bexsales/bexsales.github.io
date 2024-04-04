@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie';
 import { useState } from 'react';
 
 import Box from '@mui/material/Box';
@@ -8,6 +9,8 @@ import { alpha } from '@mui/material/styles';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+
+import { useRouter } from 'src/routes/hooks';
 
 import { account } from 'src/_mock/account';
 
@@ -33,12 +36,16 @@ const MENU_OPTIONS = [
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
 
+  const router = useRouter();
+
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
   };
 
   const handleClose = () => {
+    Cookies.remove('jwt');
     setOpen(null);
+    router.push('/login');
   };
 
   return (

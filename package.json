@@ -19,7 +19,7 @@
     "dev:host": "vite --host",
     "vite:start": "vite",
     "vite:build": "vite build",
-    "deploy" : "gh-pages -d dist"
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -29,9 +29,11 @@
     "@mui/lab": "^5.0.0-alpha.147",
     "@mui/material": "^5.14.12",
     "apexcharts": "^3.43.0",
+    "axios": "^1.6.8",
     "date-fns": "^2.30.0",
     "gh-pages": "^6.1.1",
     "history": "^5.3.0",
+    "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
     "numeral": "^2.0.6",
     "prop-types": "^15.8.1",

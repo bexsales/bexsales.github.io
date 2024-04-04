@@ -1,10 +1,13 @@
+import config from 'src/config/config'; // Adjust the import path as necessary
+
+import axios from 'axios';
+import Cookies from 'js-cookie'; // Import js-cookie for managing cookies
 import { useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -29,19 +32,62 @@ export default function LoginView() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleClick = () => {
-    router.push('/dashboard');
+  const [loading, setLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
+    identifier: '',
+    password: '',
+  });
+  const [authError, setAuthError] = useState(null); // Renamed error to authError
+
+  // Function to handle input change
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleClick = async () => {
+    setLoading(true); // Set loading to true when authentication process starts
+    try {
+      // Send request to Strapi for authentication
+      const response = await axios.post(`${config.baseURL}/auth/local`, {
+        identifier: formData.identifier, // Replace with actual email
+        password: formData.password, // Replace with actual password
+      });
+
+      // Handle successful authentication
+      console.log('Authentication successful', response.data);
+      Cookies.set('jwt', response.data.jwt, { expires: 7 }); // Expires in 7 days
+      // Redirect user to dashboard or any other protected route
+      router.push('/');
+    } catch (error) {
+      // Handle authentication error
+      console.error('Authentication error', error);
+      // Optionally, display error message to user
+      setAuthError('Invalid email or password.')
+    } finally {
+      setLoading(false); // Set loading to false regardless of authentication success or failure
+    }
   };
 
   const renderForm = (
     <>
       <Stack spacing={3}>
-        <TextField name="email" label="Email address" />
+        <TextField 
+          name="identifier" 
+          label="Email address"
+          value={formData.identifier}
+          onChange={handleInputChange} 
+        />
 
         <TextField
           name="password"
           label="Password"
           type={showPassword ? 'text' : 'password'}
+          value={formData.password}
+          onChange={handleInputChange}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -53,6 +99,12 @@ export default function LoginView() {
           }}
         />
       </Stack>
+
+      {authError && ( // Display error message if authError state is not null
+        <Typography color="error" sx={{ mt: 1 }}>
+          {authError}
+        </Typography>
+      )}
 
       <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
         <Link variant="subtitle2" underline="hover">
@@ -67,6 +119,7 @@ export default function LoginView() {
         variant="contained"
         color="inherit"
         onClick={handleClick}
+        loading={loading}
       >
         Login
       </LoadingButton>
@@ -108,7 +161,7 @@ export default function LoginView() {
             </Link>
           </Typography>
 
-          <Stack direction="row" spacing={2}>
+          {/* <Stack direction="row" spacing={2}>
             <Button
               fullWidth
               size="large"
@@ -138,13 +191,9 @@ export default function LoginView() {
             >
               <Iconify icon="eva:twitter-fill" color="#1C9CEA" />
             </Button>
-          </Stack>
+          </Stack> */}
 
-          <Divider sx={{ my: 3 }}>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              OR
-            </Typography>
-          </Divider>
+          <Divider sx={{ my: 3 }} />
 
           {renderForm}
         </Card>
