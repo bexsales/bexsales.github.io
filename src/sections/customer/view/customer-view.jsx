@@ -2,19 +2,17 @@ import config from 'src/config/config'; // Adjust the import path as necessary
 
 import axios from 'axios';
 import Cookies from 'js-cookie'; // Import js-cookie for managing cookies
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
-import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 
 import TableNoData from '../table-no-data';
@@ -31,6 +29,8 @@ export default function CustomerView() {
 
   const [page, setPage] = useState(0);
 
+  const [maxRecord, setMaxRecord] = useState(0);
+
   const [order, setOrder] = useState('asc');
 
   const [selected, setSelected] = useState([]);
@@ -41,24 +41,34 @@ export default function CustomerView() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const [totalCount, setTotalCount] = useState(0);
+
+  const customersRef = useRef(customers);
+  const rowsPerPageRef = useRef(rowsPerPage);
+  const pageRef = useRef(page);
+
   useEffect(() => {
     // Fetch customers from the API
-    fetchCustomers(page, rowsPerPage);
-  }, [page, rowsPerPage]);
+    customersRef.current = customers;
+    rowsPerPageRef.current = rowsPerPage;
+    pageRef.current = page;
+    fetchCustomers(pageRef.current, rowsPerPageRef.current, customersRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const fetchCustomers = (pg, lm) => {
-    const normalizedPageNumber = Math.max(0, pg);
-    // Calculate the offset
-    const offset = normalizedPageNumber * lm;
+  const fetchCustomers = (pg, lm, cst) => {
+    console.log('Fetching Customers')
+    const normalizedPageNumber = pg + 1;
 
-    axios.get(`${config.baseURL}/api-proxy/proxy?method=get&resource=customers&offset=${offset}&page_size=${lm}`, {
+    axios.get(`${config.baseURL}/api-proxy/proxy?method=get&resource=customers&page=${normalizedPageNumber}&page_size=${lm}`, {
       headers: {
         Authorization: `Bearer ${Cookies.get('jwt')}`, // Replace with your actual JWT token
       }
     })
     .then(response => {
       console.log(response.data.data);
-      setCustomers(response.data.data);
+      setCustomers([...cst,...response.data.data]);
+      setTotalCount(response.data.count);
     })
     .catch(error => {
       console.error('Error fetching customers:', error);
@@ -102,6 +112,12 @@ export default function CustomerView() {
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
+    const numberOfRecords = rowsPerPage * newPage;
+    if (numberOfRecords > maxRecord) {
+      setMaxRecord(numberOfRecords);
+      fetchCustomers(newPage, rowsPerPage, customers)
+    }
+
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -126,10 +142,6 @@ export default function CustomerView() {
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4">Customers</Typography>
-
-        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
-          New User
-        </Button>
       </Stack>
 
       <Card>
@@ -195,7 +207,7 @@ export default function CustomerView() {
         <TablePagination
           page={page}
           component="div"
-          count={customers.length}
+          count={totalCount}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}
