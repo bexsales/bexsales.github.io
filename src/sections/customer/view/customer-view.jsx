@@ -43,11 +43,15 @@ export default function CustomerView() {
 
   useEffect(() => {
     // Fetch customers from the API
-    fetchCustomers();
-  }, []);
+    fetchCustomers(page, rowsPerPage);
+  }, [page, rowsPerPage]);
 
-  const fetchCustomers = () => {
-    axios.get(`${config.baseURL}/api-proxy/proxy?method=get&resource=customers`, {
+  const fetchCustomers = (pg, lm) => {
+    const normalizedPageNumber = Math.max(0, pg);
+    // Calculate the offset
+    const offset = normalizedPageNumber * lm;
+
+    axios.get(`${config.baseURL}/api-proxy/proxy?method=get&resource=customers&offset=${offset}&page_size=${lm}`, {
       headers: {
         Authorization: `Bearer ${Cookies.get('jwt')}`, // Replace with your actual JWT token
       }
