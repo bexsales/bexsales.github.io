@@ -1,4 +1,8 @@
-import { useState } from 'react';
+import config from 'src/config/config'; // Adjust the import path as necessary
+
+import axios from 'axios';
+import Cookies from 'js-cookie'; // Import js-cookie for managing cookies
+import { useState, useEffect } from 'react';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -9,8 +13,6 @@ import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
-
-import { users } from 'src/_mock/user';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
@@ -24,7 +26,9 @@ import { emptyRows, applyFilter, getComparator } from '../utils';
 
 // ----------------------------------------------------------------------
 
-export default function UserPage() {
+export default function CustomerView() {
+  const [customers, setCustomers] = useState([]);
+
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -37,6 +41,26 @@ export default function UserPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  useEffect(() => {
+    // Fetch customers from the API
+    fetchCustomers();
+  }, []);
+
+  const fetchCustomers = () => {
+    axios.get(`${config.baseURL}/api-proxy/proxy?method=get&resource=customers`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('jwt')}`, // Replace with your actual JWT token
+      }
+    })
+    .then(response => {
+      console.log(response.data.data);
+      setCustomers(response.data.data);
+    })
+    .catch(error => {
+      console.error('Error fetching customers:', error);
+    });
+  };
+
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
     if (id !== '') {
@@ -47,7 +71,7 @@ export default function UserPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = users.map((n) => n.name);
+      const newSelecteds = customers.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -87,7 +111,7 @@ export default function UserPage() {
   };
 
   const dataFiltered = applyFilter({
-    inputData: users,
+    inputData: customers,
     comparator: getComparator(order, orderBy),
     filterName,
   });
@@ -97,7 +121,7 @@ export default function UserPage() {
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Users</Typography>
+        <Typography variant="h4">Customers</Typography>
 
         <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
           New User
@@ -117,17 +141,20 @@ export default function UserPage() {
               <UserTableHead
                 order={order}
                 orderBy={orderBy}
-                rowCount={users.length}
+                rowCount={customers.length}
                 numSelected={selected.length}
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
                   { id: 'name', label: 'Name' },
-                  { id: 'company', label: 'Company' },
-                  { id: 'role', label: 'Role' },
-                  { id: 'isVerified', label: 'Verified', align: 'center' },
-                  { id: 'status', label: 'Status' },
-                  { id: '' },
+                  { id: 'street', label: 'Street' },
+                  { id: 'city', label: 'City' },
+                  { id: 'state', label: 'State' },
+                  { id: 'country', label: 'Country' },
+                  { id: 'zip', label: 'Zip' },
+                  { id: 'phone', label: 'Phone' },
+                  { id: 'mobile', label: 'Mobile' },
+                  { id: 'email', label: 'Email' },
                 ]}
               />
               <TableBody>
@@ -137,11 +164,14 @@ export default function UserPage() {
                     <UserTableRow
                       key={row.id}
                       name={row.name}
-                      role={row.role}
-                      status={row.status}
-                      company={row.company}
-                      avatarUrl={row.avatarUrl}
-                      isVerified={row.isVerified}
+                      street={row.street}
+                      city={row.city}
+                      state={row.state_id.name}
+                      country={row.country_id.name}
+                      zip={row.zip}
+                      phone={row.phone}
+                      mobile={row.mobile}
+                      email={row.email}
                       selected={selected.indexOf(row.name) !== -1}
                       handleClick={(event) => handleClick(event, row.name)}
                     />
@@ -149,7 +179,7 @@ export default function UserPage() {
 
                 <TableEmptyRows
                   height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, users.length)}
+                  emptyRows={emptyRows(page, rowsPerPage, customers.length)}
                 />
 
                 {notFound && <TableNoData query={filterName} />}
@@ -161,7 +191,7 @@ export default function UserPage() {
         <TablePagination
           page={page}
           component="div"
-          count={users.length}
+          count={customers.length}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 25]}
