@@ -13,6 +13,8 @@ import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
+import { useRouter } from 'src/routes/hooks';
+
 import Scrollbar from 'src/components/scrollbar';
 
 import { emptyRows } from '../utils'
@@ -25,6 +27,8 @@ import OrderTableToolbar from '../order-table-toolbar';
 // ----------------------------------------------------------------------
 
 export default function OrderView() {
+  const router = useRouter();
+
   const [saleOrders, setSaleOrders] = useState([]);
 
   const [page, setPage] = useState(0);
@@ -117,6 +121,10 @@ export default function OrderView() {
     fetchOrders(page, rowsPerPage, [], filterName)
   };
 
+  const handleClick = (event, id) => {
+    router.push(`/orders/${id}`);
+  };
+
   const notFound = !saleOrders.length && !!filterName;
 
   return (
@@ -164,6 +172,7 @@ export default function OrderView() {
                       amount_tax={row.amount_tax}
                       amount_total={row.amount_total}
                       state={row.state}
+                      handleClick={(event) => handleClick(event, row.id)}
                     />
                   ))}
 

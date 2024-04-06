@@ -22,7 +22,7 @@ export default function OrderTableRow({
   const formatToDollars = (amount) => `$${amount.toFixed(2)}`;
 
   return (
-    <TableRow hover tabIndex={-1}>
+    <TableRow hover tabIndex={-1} onClick={handleClick}>
 
       <TableCell>{name}</TableCell>
       <TableCell>{customer}</TableCell>

@@ -80,6 +80,7 @@ export default function CustomerView() {
   };
 
   const handleSort = (event, id) => {
+    console.log('sort', id)
     const isAsc = orderBy === id && order === 'asc';
     if (id !== '') {
       setOrder(isAsc ? 'desc' : 'asc');
