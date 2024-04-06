@@ -15,12 +15,12 @@ import TablePagination from '@mui/material/TablePagination';
 
 import Scrollbar from 'src/components/scrollbar';
 
+import { emptyRows } from '../utils'
 import TableNoData from '../table-no-data';
 import UserTableRow from '../user-table-row';
 import UserTableHead from '../user-table-head';
 import TableEmptyRows from '../table-empty-rows';
 import UserTableToolbar from '../user-table-toolbar';
-import { emptyRows, applyFilter, getComparator } from '../utils';
 
 // ----------------------------------------------------------------------
 
@@ -33,34 +33,38 @@ export default function CustomerView() {
 
   const [order, setOrder] = useState('asc');
 
-  const [selected, setSelected] = useState([]);
-
   const [orderBy, setOrderBy] = useState('name');
 
   const [filterName, setFilterName] = useState('');
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
 
   const [totalCount, setTotalCount] = useState(0);
 
   const customersRef = useRef(customers);
   const rowsPerPageRef = useRef(rowsPerPage);
   const pageRef = useRef(page);
+  const filterNameRef = useRef(filterName);
 
   useEffect(() => {
     // Fetch customers from the API
     customersRef.current = customers;
     rowsPerPageRef.current = rowsPerPage;
     pageRef.current = page;
-    fetchCustomers(pageRef.current, rowsPerPageRef.current, customersRef.current);
+    filterNameRef.current = filterName;
+    fetchCustomers(pageRef.current, rowsPerPageRef.current, customersRef.current, filterNameRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchCustomers = (pg, lm, cst) => {
+  const fetchCustomers = (pg, lm, cst, nm) => {
     console.log('Fetching Customers')
     const normalizedPageNumber = pg + 1;
-
-    axios.get(`${config.baseURL}/api-proxy/proxy?method=get&resource=customers&page=${normalizedPageNumber}&page_size=${lm}`, {
+    let requestUrl = `${config.baseURL}/api-proxy/proxy?method=get&resource=customers&page=${normalizedPageNumber}&page_size=${lm}`
+    if (nm) {
+      requestUrl += `&name=${nm}`;
+    }
+    console.log(requestUrl);
+    axios.get(requestUrl, {
       headers: {
         Authorization: `Bearer ${Cookies.get('jwt')}`, // Replace with your actual JWT token
       }
@@ -83,33 +87,6 @@ export default function CustomerView() {
     }
   };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = customers.map((n) => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
-
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
-  };
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     const numberOfRecords = rowsPerPage * newPage;
@@ -126,17 +103,21 @@ export default function CustomerView() {
   };
 
   const handleFilterByName = (event) => {
-    setPage(0);
     setFilterName(event.target.value);
   };
 
-  const dataFiltered = applyFilter({
-    inputData: customers,
-    comparator: getComparator(order, orderBy),
-    filterName,
-  });
+  const handleEnter = (event) => {
+    if (event.key === 'Enter') {
+      handleClickSearch();
+    }
+  };
 
-  const notFound = !dataFiltered.length && !!filterName;
+  const handleClickSearch = (event) => {
+    setPage(0);
+    fetchCustomers(page, rowsPerPage, [], filterName)
+  };
+
+  const notFound = !customers.length && !!filterName;
 
   return (
     <Container>
@@ -146,9 +127,10 @@ export default function CustomerView() {
 
       <Card>
         <UserTableToolbar
-          numSelected={selected.length}
           filterName={filterName}
           onFilterName={handleFilterByName}
+          onClickSearch={handleClickSearch}
+          onHitEnter={handleEnter}
         />
 
         <Scrollbar>
@@ -158,9 +140,7 @@ export default function CustomerView() {
                 order={order}
                 orderBy={orderBy}
                 rowCount={customers.length}
-                numSelected={selected.length}
                 onRequestSort={handleSort}
-                onSelectAllClick={handleSelectAllClick}
                 headLabel={[
                   { id: 'name', label: 'Name' },
                   { id: 'street', label: 'Street' },
@@ -174,7 +154,7 @@ export default function CustomerView() {
                 ]}
               />
               <TableBody>
-                {dataFiltered
+                {customers
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
                     <UserTableRow
@@ -188,8 +168,6 @@ export default function CustomerView() {
                       phone={row.phone}
                       mobile={row.mobile}
                       email={row.email}
-                      selected={selected.indexOf(row.name) !== -1}
-                      handleClick={(event) => handleClick(event, row.name)}
                     />
                   ))}
 
@@ -210,7 +188,7 @@ export default function CustomerView() {
           count={totalCount}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[25]}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Card>
