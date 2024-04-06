@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types';
-
-import Toolbar from '@mui/material/Toolbar';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import { Icon } from '@iconify/react';
 import searchFill from '@iconify-icons/eva/search-fill';
 
+import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
+import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 
 // ----------------------------------------------------------------------
@@ -42,4 +41,5 @@ UserTableToolbar.propTypes = {
   filterName: PropTypes.string,
   onFilterName: PropTypes.func,
   onClickSearch: PropTypes.func,
+  onHitEnter: PropTypes.func,
 };

@@ -48,6 +48,13 @@ export default function LoginView() {
     });
   };
 
+  // Function to handle input change
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleClick();
+    }
+  };
+
   const handleClick = async () => {
     setLoading(true); // Set loading to true when authentication process starts
     try {
@@ -88,6 +95,7 @@ export default function LoginView() {
           type={showPassword ? 'text' : 'password'}
           value={formData.password}
           onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -152,7 +160,7 @@ export default function LoginView() {
             maxWidth: 420,
           }}
         >
-          <Typography variant="h4">Sign in to Minimal</Typography>
+          <Typography variant="h4">Sign in to BEX Sales</Typography>
 
           <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
             Don’t have an account?
@@ -160,38 +168,6 @@ export default function LoginView() {
               Get started
             </Link>
           </Typography>
-
-          {/* <Stack direction="row" spacing={2}>
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:google-fill" color="#DF3E30" />
-            </Button>
-
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:facebook-fill" color="#1877F2" />
-            </Button>
-
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:twitter-fill" color="#1C9CEA" />
-            </Button>
-          </Stack> */}
 
           <Divider sx={{ my: 3 }} />
 
