@@ -92,7 +92,7 @@ export default function CustomerView() {
     const numberOfRecords = rowsPerPage * newPage;
     if (numberOfRecords > maxRecord) {
       setMaxRecord(numberOfRecords);
-      fetchCustomers(newPage, rowsPerPage, customers)
+      fetchCustomers(newPage, rowsPerPage, customers, filterName)
     }
 
   };

@@ -14,18 +14,18 @@ const navConfig = [
   },
   {
     title: 'customer',
-    path: '/customer',
+    path: '/customers',
     icon: icon('ic_user'),
   },
   {
     title: 'product',
     path: '/products',
-    icon: icon('ic_cart'),
+    icon: icon('ic_notification_package'),
   },
   {
-    title: 'blog',
-    path: '/blog',
-    icon: icon('ic_blog'),
+    title: 'order',
+    path: '/orders',
+    icon: icon('ic_cart'),
   },
 ];
 
