@@ -28,7 +28,15 @@ export default function NewOrderView() {
 
   const [partner, setPartner] = useState({
     id: 0,
-    name: ''
+    name: '',
+    street: '',
+    city: '',
+    state: '',
+    country: '',
+    zip: '',
+    phone: '',
+    mobile: '',
+    email: ''
   });
 
   // const [orderLine, setOrderLine] = useState([]);
@@ -44,7 +52,15 @@ export default function NewOrderView() {
     console.log(customer)
     setPartner({
       id: customer.id,
-      name: customer.name
+      name: customer.name,
+      street: customer.street,
+      city: customer.city,
+      state: customer.state,
+      country: customer.country,
+      zip: customer.zip,
+      phone: customer.phone,
+      mobile: customer.mobile,
+      email: customer.email
     })
   }; 
 
@@ -93,6 +109,20 @@ export default function NewOrderView() {
           }}
         />
       </Stack>
+      {/* Display partner address and phone */}
+      {partner.name && ( // Display error message if authError state is not null
+        <>
+          <div style={{ margin: '16px 0' }} />
+          <Typography variant="body1" fontWeight="bold">Address:</Typography>
+          <Typography variant="body1">{partner.street}</Typography>
+          <Typography variant="body1">{partner.city} {partner.state}</Typography>
+          <Typography variant="body1">{partner.country} {partner.zip}</Typography>
+          <Typography variant="body1"><b>Phone:</b> {partner.phone}</Typography>
+          <Typography variant="body1"><b>Mobile:</b> {partner.mobile}</Typography>
+          <Typography variant="body1"><b>Email:</b> {partner.email}</Typography>
+        </>
+      )}
+      <div style={{ margin: '16px 0' }} />
       <LoadingButton
         fullWidth
         size="large"
