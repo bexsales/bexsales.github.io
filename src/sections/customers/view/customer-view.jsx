@@ -2,6 +2,7 @@ import config from 'src/config/config'; // Adjust the import path as necessary
 
 import axios from 'axios';
 import Cookies from 'js-cookie'; // Import js-cookie for managing cookies
+import PropTypes from 'prop-types';
 import { useRef, useState, useEffect } from 'react';
 
 import Card from '@mui/material/Card';
@@ -24,7 +25,10 @@ import UserTableToolbar from '../user-table-toolbar';
 
 // ----------------------------------------------------------------------
 
-export default function CustomerView() {
+export default function CustomerView({
+  showTitle,
+  onSelect,
+}) {
   const [customers, setCustomers] = useState([]);
 
   const [page, setPage] = useState(0);
@@ -122,9 +126,11 @@ export default function CustomerView() {
 
   return (
     <Container>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Customers</Typography>
-      </Stack>
+      {showTitle && ( // Display error message if authError state is not null
+        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+          <Typography variant="h4">Customers</Typography>
+        </Stack>
+      )}
 
       <Card>
         <UserTableToolbar
@@ -160,6 +166,7 @@ export default function CustomerView() {
                   .map((row) => (
                     <UserTableRow
                       key={row.id}
+                      id={row.id}
                       name={row.name}
                       street={row.street}
                       city={row.city}
@@ -169,6 +176,7 @@ export default function CustomerView() {
                       phone={row.phone}
                       mobile={row.mobile}
                       email={row.email}
+                      onSelect={onSelect}
                     />
                   ))}
 
@@ -196,3 +204,8 @@ export default function CustomerView() {
     </Container>
   );
 }
+
+CustomerView.propTypes = {
+  showTitle: PropTypes.bool,
+  onSelect: PropTypes.func,
+};

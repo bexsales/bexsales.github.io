@@ -1,0 +1,1 @@
+export { default as NewOrderView } from './new-order-view';

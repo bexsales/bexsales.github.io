@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import AppOrderTimeline from '../app-order-timeline';
 import AppWebsiteVisits from '../app-website-visits';
 import AppWidgetSummary from '../app-widget-summary';
+import CreateOrderButton from '../create-order-button';
 import AppConversionRates from '../app-conversion-rates';
 
 // ----------------------------------------------------------------------
@@ -19,7 +20,10 @@ export default function AppView() {
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid xs={12} sm={6} md={4}>
+        <Grid xs={12} sm={6} md={3}>
+            <CreateOrderButton />
+        </Grid>
+        <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Weekly Sales"
             total={714000}
@@ -28,7 +32,7 @@ export default function AppView() {
           />
         </Grid>
 
-        <Grid xs={12} sm={6} md={4}>
+        <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="New Users"
             total={1352831}
@@ -37,7 +41,7 @@ export default function AppView() {
           />
         </Grid>
 
-        <Grid xs={12} sm={6} md={4}>
+        <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Item Orders"
             total={1723315}

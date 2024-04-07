@@ -6,7 +6,7 @@ import TableCell from '@mui/material/TableCell';
 // ----------------------------------------------------------------------
 
 export default function UserTableRow({
-  selected,
+  id,
   name,
   street,
   city,
@@ -16,11 +16,22 @@ export default function UserTableRow({
   phone,
   mobile,
   email,
-  handleClick,
+  onSelect,
 }) {
 
   return (
-    <TableRow hover tabIndex={-1}>
+    <TableRow hover tabIndex={-1} onClick={() => onSelect({
+      id, 
+      name,
+      street,
+      city,
+      state,
+      country,
+      zip,
+      phone,
+      mobile,
+      email
+    })}>
 
       <TableCell>{name}</TableCell>
       <TableCell>{street}</TableCell>
@@ -37,7 +48,7 @@ export default function UserTableRow({
 }
 
 UserTableRow.propTypes = {
-  selected: PropTypes.any,
+  id: PropTypes.any,
   name: PropTypes.any,
   street: PropTypes.any,
   city: PropTypes.any,
@@ -47,5 +58,5 @@ UserTableRow.propTypes = {
   phone: PropTypes.any,
   mobile: PropTypes.any,
   email: PropTypes.any,
-  handleClick: PropTypes.func,
+  onSelect: PropTypes.func,
 };

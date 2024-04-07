@@ -16,7 +16,7 @@ export default function CustomerPage() {
         <title> Customer | BEX Sales </title>
       </Helmet>
 
-      <CustomerView />
+      <CustomerView showTitle/>
     </>
   );
 }
