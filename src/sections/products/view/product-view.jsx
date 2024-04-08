@@ -19,8 +19,8 @@ import Scrollbar from 'src/components/scrollbar';
 
 import { emptyRows } from '../utils'
 import TableNoData from '../table-no-data';
-import ProductTableRow from '../product-table-row';
 import TableEmptyRows from '../table-empty-rows';
+import ProductTableRow from '../product-table-row';
 import ProductTableHead from '../product-table-head';
 import ProductTableToolbar from '../product-table-toolbar';
 

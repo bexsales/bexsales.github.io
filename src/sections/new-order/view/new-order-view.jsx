@@ -7,7 +7,7 @@ import Cookies from 'js-cookie'; // Import js-cookie for managing cookies
 import { useState } from 'react';
 
 import Card from '@mui/material/Card';
-import { Stack } from '@mui/material';
+import { Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
@@ -17,6 +17,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { useRouter } from 'src/routes/hooks';
 
 import CustomerPopupModal from '../new-order-customer-popup';
+import ProductPopupModal from '../new-order-product-popup';
 
 // ----------------------------------------------------------------------
 
@@ -39,13 +40,11 @@ export default function NewOrderView() {
     email: ''
   });
 
-  // const [orderLine, setOrderLine] = useState([]);
+  const [orderLine, setOrderLine] = useState([]);
 
-  // const handleSetPartnerId = () => {
-  // };
-
-  // const handleAddProductLine = () => {
-  // };
+  const handleAddProduct = () => {
+    console.log('Open modal')
+  };
 
   const handleSelectedCustomer = (customer) => {
     console.log('Setting order partner')
@@ -62,6 +61,26 @@ export default function NewOrderView() {
       mobile: customer.mobile,
       email: customer.email
     })
+  }; 
+
+  const handleSelectedProduct = (product) => {
+    console.log('Adding order line')
+    console.log(product)
+    setOrderLine([...orderLine,{
+      id: product.id,
+      name: product.name,
+      default_code: product.default_code,
+      category: product.categ_id.name,
+      type: product.type,
+      standard_price: product.standard_price,
+      lst_price: product.lst_price,
+      invoice_policy: product.invoice_policy,
+      description_sale: product.description_sale,
+      sale_ok: product.sale_ok,
+      purchase_ok: product.purchase_ok,
+      sales_count: product.sales_count,
+      product_uom_qty: 1
+    }]);
   }; 
 
   const handleCreateOrder = () => {
@@ -122,6 +141,33 @@ export default function NewOrderView() {
           <Typography variant="body1"><b>Email:</b> {partner.email}</Typography>
         </>
       )}
+      <div style={{ margin: '16px 0' }} />
+      <IconButton>
+        <ProductPopupModal onSelect={handleSelectedProduct}/>
+      </IconButton>
+      <div style={{ margin: '16px 0' }} />
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Default Code</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>List Price</TableCell>
+              <TableCell>Qty</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {orderLine.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell>{item.default_code}</TableCell>
+                <TableCell>{item.name}</TableCell>
+                <TableCell>{item.lst_price}</TableCell>
+                <TableCell>{item.product_uom_qty}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
       <div style={{ margin: '16px 0' }} />
       <LoadingButton
         fullWidth
