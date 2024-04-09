@@ -16,7 +16,7 @@ export default function ProductsPage() {
         <title> Products | Minimal UI </title>
       </Helmet>
 
-      <ProductView />
+      <ProductView showTitle/>
     </>
   );
 }

@@ -7,17 +7,26 @@ import Cookies from 'js-cookie'; // Import js-cookie for managing cookies
 import { useState } from 'react';
 
 import Card from '@mui/material/Card';
-import { Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { 
+  Stack, 
+  Table,
+  Paper,  
+  TableRow,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableContainer
+} from '@mui/material';
 
 import { useRouter } from 'src/routes/hooks';
 
-import CustomerPopupModal from '../new-order-customer-popup';
 import ProductPopupModal from '../new-order-product-popup';
+import CustomerPopupModal from '../new-order-customer-popup';
 
 // ----------------------------------------------------------------------
 
@@ -42,9 +51,8 @@ export default function NewOrderView() {
 
   const [orderLine, setOrderLine] = useState([]);
 
-  const handleAddProduct = () => {
-    console.log('Open modal')
-  };
+  // Format amount to dollars
+  const formatToDollars = (amount) => `$${amount.toFixed(2)}`;
 
   const handleSelectedCustomer = (customer) => {
     console.log('Setting order partner')
@@ -66,11 +74,11 @@ export default function NewOrderView() {
   const handleSelectedProduct = (product) => {
     console.log('Adding order line')
     console.log(product)
-    setOrderLine([...orderLine,{
+    setOrderLine([...orderLine, {
       id: product.id,
       name: product.name,
       default_code: product.default_code,
-      category: product.categ_id.name,
+      category: product.category,
       type: product.type,
       standard_price: product.standard_price,
       lst_price: product.lst_price,
@@ -88,10 +96,16 @@ export default function NewOrderView() {
     console.log('Creating an order')
     const requestUrl = `${config.baseURL}/api-proxy/proxy?method=post&resource=orders`
     console.log(requestUrl);
+    console.log(orderLine)
+    const orderLinePrepped = orderLine.map(line => ({
+      product_id: line.id,
+      product_uom_qty: line.product_uom_qty
+    }));
+    console.log(orderLinePrepped)
     const requestBody = {
       order: {
         partner_id: partner.id,
-        order_line: []
+        order_line: orderLinePrepped
       }
     };
     console.log('Request body', requestBody);
@@ -161,7 +175,7 @@ export default function NewOrderView() {
               <TableRow key={index}>
                 <TableCell>{item.default_code}</TableCell>
                 <TableCell>{item.name}</TableCell>
-                <TableCell>{item.lst_price}</TableCell>
+                <TableCell>{formatToDollars(item.lst_price)}</TableCell>
                 <TableCell>{item.product_uom_qty}</TableCell>
               </TableRow>
             ))}

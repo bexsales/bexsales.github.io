@@ -6,6 +6,7 @@ import TableCell from '@mui/material/TableCell';
 // ----------------------------------------------------------------------
 
 export default function ProductTableRow({
+  id,
   default_code,
   name,
   category,
@@ -13,14 +14,23 @@ export default function ProductTableRow({
   standard_price,
   lst_price,
   description_sale,
-  handleClick
+  onSelect
 }) {
 
   // Format amount to dollars
   const formatToDollars = (amount) => `$${amount.toFixed(2)}`;
 
   return (
-    <TableRow hover tabIndex={-1} onClick={handleClick}>
+    <TableRow hover tabIndex={-1} onClick={() => onSelect({
+      id, 
+      default_code,
+      name,
+      category,
+      type,
+      standard_price,
+      lst_price,
+      description_sale
+    })}>
 
       <TableCell>{default_code}</TableCell>
       <TableCell>{name}</TableCell>
@@ -35,6 +45,7 @@ export default function ProductTableRow({
 }
 
 ProductTableRow.propTypes = {
+  id: PropTypes.any,
   default_code: PropTypes.any,
   name: PropTypes.any,
   category: PropTypes.any,
@@ -42,5 +53,5 @@ ProductTableRow.propTypes = {
   standard_price: PropTypes.any,
   lst_price: PropTypes.any,
   description_sale: PropTypes.any,
-  handleClick: PropTypes.func,
+  onSelect: PropTypes.func,
 };
