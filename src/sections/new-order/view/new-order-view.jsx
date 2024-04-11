@@ -25,6 +25,8 @@ import {
 
 import { useRouter } from 'src/routes/hooks';
 
+import Iconify from 'src/components/iconify';
+
 import ProductPopupModal from '../new-order-product-popup';
 import CustomerPopupModal from '../new-order-customer-popup';
 
@@ -50,6 +52,26 @@ export default function NewOrderView() {
   });
 
   const [orderLine, setOrderLine] = useState([]);
+
+  const handleDelete = (index, item, property) => {
+    if (index < 0 || index >= orderLine.length) {
+      // Check if n is a valid index
+      return;
+    }
+    const newOrderLine = orderLine.filter((_, ind) => ind !== index);
+    setOrderLine(newOrderLine);
+    // Add your logic to delete the item from orderLine using the index, item, or property
+  };
+
+  const handleQuantityChange = (index, newQuantity) => {
+    const updatedOrderLine = orderLine.map((item, idx) => {
+      if (idx === index) {
+        return { ...item, product_uom_qty: newQuantity !== 0 ? Number(newQuantity) : 0 };
+      }
+      return item;
+    });
+    setOrderLine(updatedOrderLine);
+  };
 
   // Format amount to dollars
   const formatToDollars = (amount) => `$${amount.toFixed(2)}`;
@@ -168,6 +190,7 @@ export default function NewOrderView() {
               <TableCell>Name</TableCell>
               <TableCell>List Price</TableCell>
               <TableCell>Qty</TableCell>
+              <TableCell/>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -176,7 +199,19 @@ export default function NewOrderView() {
                 <TableCell>{item.default_code}</TableCell>
                 <TableCell>{item.name}</TableCell>
                 <TableCell>{formatToDollars(item.lst_price)}</TableCell>
-                <TableCell>{item.product_uom_qty}</TableCell>
+                <TableCell>
+                  <TextField
+                    type="number"
+                    style={{ minWidth: '100px' }}
+                    value={item.product_uom_qty !== 0 ? item.product_uom_qty : ''}
+                    onChange={(e) => handleQuantityChange(index, e.target.value)}
+                  />
+                </TableCell>
+                <TableCell align="right">
+                  <IconButton onClick={() => handleDelete(index)}>
+                    <Iconify icon="eva:trash-2-outline" />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

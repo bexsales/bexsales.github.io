@@ -7,7 +7,7 @@ import {
     FormControl,
     DialogTitle,
     DialogContent, 
-    DialogActions 
+    DialogActions
 } from '@mui/material';
 
 import { ProductView } from '../products/view';
@@ -33,10 +33,10 @@ export default function ProductPopupModal({ onSelect }) {
       <Button variant="outlined" onClick={handleOpen}>
         Add Product
       </Button>
-      <Dialog open={open} onClose={handleClose} maxWidth="xl">
+      <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth>
         <DialogTitle>Products</DialogTitle>
         <DialogContent>
-            <FormControl sx={{ m: 0, p: 0 }}>
+            <FormControl sx={{ width: '100%' }}>
                 <ProductView onSelect={onSelectFromModal} style={{ width: '100%' }}/>
             </FormControl>
         </DialogContent>
