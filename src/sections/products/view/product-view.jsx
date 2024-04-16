@@ -2,6 +2,7 @@ import config from 'src/config/config'; // Adjust the import path as necessary
 
 import axios from 'axios';
 import Cookies from 'js-cookie'; // Import js-cookie for managing cookies
+import PropTypes from 'prop-types';
 import { useRef, useState, useEffect } from 'react';
 
 import Card from '@mui/material/Card';
@@ -12,8 +13,6 @@ import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
-
-import { useRouter } from 'src/routes/hooks';
 
 import Scrollbar from 'src/components/scrollbar';
 
@@ -26,8 +25,10 @@ import ProductTableToolbar from '../product-table-toolbar';
 
 // ----------------------------------------------------------------------
 
-export default function ProductView() {
-  const router = useRouter();
+export default function ProductView({
+  showTitle,
+  onSelect,
+}) {
 
   const [products, setProducts] = useState([]);
 
@@ -121,17 +122,15 @@ export default function ProductView() {
     fetchProducts(page, rowsPerPage, [], filterName)
   };
 
-  const handleClick = (event, id) => {
-    router.push(`/products/${id}`);
-  };
-
   const notFound = !products.length && !!filterName;
 
   return (
     <Container>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Products</Typography>
-      </Stack>
+      {showTitle && ( // Display error message if authError state is not null
+        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+          <Typography variant="h4">Products</Typography>
+        </Stack>
+      )}
 
       <Card>
         <ProductTableToolbar
@@ -165,6 +164,7 @@ export default function ProductView() {
                   .map((row) => (
                     <ProductTableRow
                       key={row.id}
+                      id={row.id}
                       default_code={row.default_code}
                       name={row.name}
                       category={row.categ_id.name}
@@ -172,7 +172,7 @@ export default function ProductView() {
                       standard_price={row.standard_price}
                       lst_price={row.lst_price}
                       description_sale={row.description_sale}
-                      handleClick={(event) => handleClick(event, row.id)}
+                      onSelect={onSelect}
                     />
                   ))}
 
@@ -200,3 +200,8 @@ export default function ProductView() {
     </Container>
   );
 }
+
+ProductView.propTypes = {
+  showTitle: PropTypes.bool,
+  onSelect: PropTypes.func,
+};
