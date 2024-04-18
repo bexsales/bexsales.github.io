@@ -154,10 +154,14 @@ export default function OrderDetailView({
     .then(response => {
       console.log(response.data);
       setLoading(false);
-      router.push(`/orders/${response.data.result.sale_order_id}`);
+      if ( response.data.result.success === false ) {
+        alert(response.data.result.message);
+      } else {
+        router.push(`/orders/${response.data.result.sale_order_id}`);
+      }
     })
     .catch(error => {
-      console.error('Error fetching customers:', error);
+      console.error('Error saving order:', error);
     });
   };
 
