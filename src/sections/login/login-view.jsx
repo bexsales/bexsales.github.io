@@ -5,7 +5,6 @@ import Cookies from 'js-cookie'; // Import js-cookie for managing cookies
 import { useState } from 'react';
 
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
@@ -114,11 +113,7 @@ export default function LoginView() {
         </Typography>
       )}
 
-      <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
-        <Link variant="subtitle2" underline="hover">
-          Forgot password?
-        </Link>
-      </Stack>
+      <div style={{ margin: '16px 0' }} />
 
       <LoadingButton
         fullWidth
@@ -161,13 +156,6 @@ export default function LoginView() {
           }}
         >
           <Typography variant="h4">Sign in to BEX Sales</Typography>
-
-          <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
-            Don’t have an account?
-            <Link variant="subtitle2" sx={{ ml: 0.5 }}>
-              Get started
-            </Link>
-          </Typography>
 
           <Divider sx={{ my: 3 }} />
 
