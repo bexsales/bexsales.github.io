@@ -15,6 +15,7 @@ export default function OrderTableRow({
   amount_tax,
   amount_total,
   state,
+  x_studio_notes,
   handleClick,
 }) {
 
@@ -33,6 +34,7 @@ export default function OrderTableRow({
       <TableCell>
           <Label color={(state !== 'draft' && 'error') || 'success'}>{state}</Label>
       </TableCell>
+      <TableCell>{x_studio_notes}</TableCell>
 
     </TableRow>
   );
@@ -46,5 +48,6 @@ OrderTableRow.propTypes = {
   amount_tax: PropTypes.any,
   amount_total: PropTypes.any,
   state: PropTypes.any,
+  x_studio_notes: PropTypes.any,
   handleClick: PropTypes.func,
 };

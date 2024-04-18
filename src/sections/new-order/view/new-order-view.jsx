@@ -12,7 +12,8 @@ import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { 
+import {
+  Grid,
   Stack, 
   Table,
   Paper,  
@@ -57,6 +58,8 @@ export default function NewOrderView() {
   const [subTotal, setSubTotal] = useState(0);
   const [total, setTotal] = useState(0);
 
+  const [notes, setNotes] = useState('');
+
   const handleGetOrderTotals = (_partnerId, _orderLine) => {
     console.log('Fetching order totals')
     const requestUrl = `${config.baseURL}/api-proxy/proxy?method=post&resource=ordertotals`
@@ -67,7 +70,7 @@ export default function NewOrderView() {
     }));
     const requestBody = {
       partner_id: partner.id,
-      order_line: orderLinePrepped
+      order_line: orderLinePrepped,
     };
     console.log('Request body', requestBody);
     axios.post(requestUrl, requestBody, {
@@ -145,7 +148,6 @@ export default function NewOrderView() {
       default_code: product.default_code,
       category: product.category,
       type: product.type,
-      standard_price: product.standard_price,
       lst_price: product.lst_price,
       invoice_policy: product.invoice_policy,
       description_sale: product.description_sale,
@@ -154,7 +156,11 @@ export default function NewOrderView() {
       sales_count: product.sales_count,
       product_uom_qty: 1
     }]);
-  }; 
+  };
+
+  const handleChangeNotes = (event) => {
+    setNotes(event.target.value);
+  };
 
   const handleCreateOrder = () => {
     setLoading(true); // Set loading to true when authentication process starts
@@ -170,7 +176,8 @@ export default function NewOrderView() {
     const requestBody = {
       order: {
         partner_id: partner.id,
-        order_line: orderLinePrepped
+        order_line: orderLinePrepped,
+        x_studio_notes: notes,
       }
     };
     console.log('Request body', requestBody);
@@ -263,6 +270,19 @@ export default function NewOrderView() {
       <div style={{ margin: '16px 0' }} />
       <Typography variant="body1" fontWeight="bold">Subtotal: {formatToDollars(subTotal)}</Typography>
       <Typography variant="body1" fontWeight="bold">Total: {formatToDollars(total)}</Typography>
+      <div style={{ margin: '16px 0' }} />
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6} lg={6}>
+          <TextField
+            label="Notes"
+            value={notes}
+            multiline
+            fullWidth
+            rows={4} // Number of rows to display
+            onChange={handleChangeNotes}
+          />
+        </Grid>
+      </Grid>
       <div style={{ margin: '16px 0' }} />
       <LoadingButton
         fullWidth

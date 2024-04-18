@@ -11,7 +11,6 @@ export default function ProductTableRow({
   name,
   category,
   type,
-  standard_price,
   lst_price,
   description_sale,
   onSelect
@@ -27,7 +26,6 @@ export default function ProductTableRow({
       name,
       category,
       type,
-      standard_price,
       lst_price,
       description_sale
     })}>
@@ -36,7 +34,6 @@ export default function ProductTableRow({
       <TableCell>{name}</TableCell>
       <TableCell>{category}</TableCell>
       <TableCell>{type}</TableCell>
-      <TableCell>{formatToDollars(standard_price)}</TableCell>
       <TableCell>{formatToDollars(lst_price)}</TableCell>
       <TableCell>{description_sale}</TableCell>
 
@@ -50,7 +47,6 @@ ProductTableRow.propTypes = {
   name: PropTypes.any,
   category: PropTypes.any,
   type: PropTypes.any,
-  standard_price: PropTypes.any,
   lst_price: PropTypes.any,
   description_sale: PropTypes.any,
   onSelect: PropTypes.func,

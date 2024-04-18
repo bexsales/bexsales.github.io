@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { 
+  Grid,
   Stack, 
   Table,
   Paper,  
@@ -65,6 +66,8 @@ export default function OrderDetailView({
   const [subTotal, setSubTotal] = useState(0);
   const [total, setTotal] = useState(0);
 
+  const [notes, setNotes] = useState('');
+
   useEffect(() => {
     // Fetch order details from the API
     fetchOrder();
@@ -109,6 +112,10 @@ export default function OrderDetailView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [partner, orderLine]); 
 
+  const handleChangeNotes = (event) => {
+    setNotes(event.target.value);
+  };
+
   const handleSaveOrder = (cancel) => {
     setLoading(true); // Set loading to true when authentication process starts
     console.log('Saving Order')
@@ -141,7 +148,8 @@ export default function OrderDetailView({
       order: {
         id: parseInt(orderId, 10),
         partner_id: partner.id,
-        order_line: _combinedOrderLines
+        order_line: _combinedOrderLines,
+        x_studio_notes: notes,
       }
     };
     console.log('Request body', requestBody);
@@ -214,6 +222,7 @@ export default function OrderDetailView({
       console.log(response.data.data);
       setOrderName(response.data.data.name);
       setPartner(response.data.data.customer_id);
+      setNotes(response.data.data.x_studio_notes);
       const _orderLinesPrepped = response.data.data.order_line.map((line) => 
         [
           1, // 1 means edit
@@ -337,6 +346,19 @@ export default function OrderDetailView({
       <div style={{ margin: '16px 0' }} />
       <Typography variant="body1" fontWeight="bold">Subtotal: {formatToDollars(subTotal)}</Typography>
       <Typography variant="body1" fontWeight="bold">Total: {formatToDollars(total)}</Typography>
+      <div style={{ margin: '16px 0' }} />
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6} lg={6}>
+          <TextField
+            label="Notes"
+            value={notes}
+            multiline
+            fullWidth
+            rows={4} // Number of rows to display
+            onChange={handleChangeNotes}
+          />
+        </Grid>
+      </Grid>
       <div style={{ margin: '16px 0' }} />
       <LoadingButton
         fullWidth

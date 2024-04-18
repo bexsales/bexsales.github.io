@@ -156,7 +156,8 @@ export default function OrderView() {
                   { id: 'amount_untaxed', label: 'Amount Untaxed' },
                   { id: 'amount_tax', label: 'Amount Tax' },
                   { id: 'amount_total', label: 'Amount Total' },
-                  { id: 'state', label: 'State' }
+                  { id: 'state', label: 'State' },
+                  { id: 'x_studio_notes', label: 'Notes' }
                 ]}
               />
               <TableBody>
@@ -172,6 +173,7 @@ export default function OrderView() {
                       amount_tax={row.amount_tax}
                       amount_total={row.amount_total}
                       state={row.state}
+                      x_studio_notes={row.x_studio_notes}
                       handleClick={(event) => handleClick(event, row.id)}
                     />
                   ))}

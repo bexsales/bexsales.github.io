@@ -153,8 +153,7 @@ export default function ProductView({
                   { id: 'name', label: 'Name' },
                   { id: 'category', label: 'Category' },
                   { id: 'type', label: 'Type' },
-                  { id: 'standard_price', label: 'Standard Price' },
-                  { id: 'lst_price', label: 'List Price' },
+                  { id: 'lst_price', label: 'Sale Price' },
                   { id: 'description_sale', label: 'Description' }
                 ]}
               />
@@ -169,7 +168,6 @@ export default function ProductView({
                       name={row.name}
                       category={row.categ_id.name}
                       type={row.type}
-                      standard_price={row.standard_price}
                       lst_price={row.lst_price}
                       description_sale={row.description_sale}
                       onSelect={onSelect}
