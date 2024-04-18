@@ -24,8 +24,6 @@ import {
   TableContainer
 } from '@mui/material';
 
-import { useRouter } from 'src/routes/hooks';
-
 import Iconify from 'src/components/iconify';
 
 import ProductPopupModal from '../edit-product-popup';
@@ -36,8 +34,6 @@ import CustomerPopupModal from '../edit-customer-popup';
 export default function OrderDetailView({
   orderId,
 }) {
-
-  const router = useRouter();
 
   const [loading, setLoading] = useState(false);
 
@@ -165,7 +161,7 @@ export default function OrderDetailView({
       if ( response.data.result.success === false ) {
         alert(response.data.result.message);
       } else {
-        router.push(`/orders/${response.data.result.sale_order_id}`);
+        window.location.reload();
       }
     })
     .catch(error => {
