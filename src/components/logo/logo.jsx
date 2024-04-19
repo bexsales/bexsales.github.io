@@ -39,8 +39,8 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
         xmlnsXlink="http://www.w3.org/1999/xlink" 
         x="0px" 
         y="0px"
-        viewBox="0 0 40 40" 
-        style={{ enableBackground: 'new 0 0 40 40' }} 
+        viewBox="0 20 40 15" 
+        style={{ enableBackground: 'new 0 20 40 15' }} 
         xmlSpace="preserve"
       >
       <style>{`
