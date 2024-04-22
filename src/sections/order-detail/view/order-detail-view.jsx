@@ -28,6 +28,7 @@ import Iconify from 'src/components/iconify';
 
 import ProductPopupModal from '../edit-product-popup';
 import CustomerPopupModal from '../edit-customer-popup';
+import CancelOrderPopupModal from '../cancel-order-popup';
 
 // ----------------------------------------------------------------------
 
@@ -376,15 +377,9 @@ export default function OrderDetailView({
         <Typography variant="h4">Order {orderName} [{orderState}]</Typography>
         {/* Cancel Order Button */}
         {orderState === 'draft' && (
-          <Stack direction="row" alignItems="center">
-            <Typography variant="body1" sx={{ color: 'red' }}>Cancel</Typography>
-            <IconButton
-              onClick={handleCancelOrder}
-              sx={{ color: 'red' }} // Set the color to red
-            >
-              <Iconify icon="eva:close-outline" /> {/* Replace with the appropriate close icon */}
-            </IconButton>
-          </Stack>
+          <CancelOrderPopupModal 
+            handleCancelOrder={handleCancelOrder}
+          />
         )}
       </Stack>
       {renderForm}
