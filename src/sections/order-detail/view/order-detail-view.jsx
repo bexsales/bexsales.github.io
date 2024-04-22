@@ -64,6 +64,7 @@ export default function OrderDetailView({
   const [total, setTotal] = useState(0);
 
   const [notes, setNotes] = useState('');
+  const [clientOrderRef, setClientOrderRef] = useState('');
 
   useEffect(() => {
     // Fetch order details from the API
@@ -113,6 +114,10 @@ export default function OrderDetailView({
     setNotes(event.target.value);
   };
 
+  const handleChangeClientOrderRef = (event) => {
+    setClientOrderRef(event.target.value);
+  };
+
   const handleSaveOrder = (cancel) => {
     setLoading(true); // Set loading to true when authentication process starts
     console.log('Saving Order')
@@ -147,6 +152,7 @@ export default function OrderDetailView({
         partner_id: partner.id,
         order_line: _combinedOrderLines,
         x_studio_notes: notes,
+        client_order_ref: clientOrderRef
       }
     };
     console.log('Request body', requestBody);
@@ -220,6 +226,7 @@ export default function OrderDetailView({
       setOrderName(response.data.data.name);
       setPartner(response.data.data.customer_id);
       setNotes(response.data.data.x_studio_notes);
+      setClientOrderRef(response.data.data.client_order_ref ? response.data.data.client_order_ref : '');
       const _orderLinesPrepped = response.data.data.order_line.map((line) => 
         [
           1, // 1 means edit
@@ -356,6 +363,17 @@ export default function OrderDetailView({
           />
         </Grid>
       </Grid>
+      <div style={{ margin: '16px 0' }} />
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6} lg={6}>
+          <TextField
+            label="PO Number"
+            value={clientOrderRef}
+            fullWidth
+            onChange={handleChangeClientOrderRef}
+          />
+        </Grid>
+      </Grid> 
       <div style={{ margin: '16px 0' }} />
       <LoadingButton
         fullWidth

@@ -157,7 +157,8 @@ export default function OrderView() {
                   { id: 'amount_tax', label: 'Amount Tax' },
                   { id: 'amount_total', label: 'Amount Total' },
                   { id: 'state', label: 'State' },
-                  { id: 'x_studio_notes', label: 'Notes' }
+                  { id: 'x_studio_notes', label: 'Notes' },
+                  { id: 'client_order_ref', label: 'PO Number' }
                 ]}
               />
               <TableBody>

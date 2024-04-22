@@ -59,6 +59,7 @@ export default function NewOrderView() {
   const [total, setTotal] = useState(0);
 
   const [notes, setNotes] = useState('');
+  const [clientOrderRef, setClientOrderRef] = useState('');
 
   const handleGetOrderTotals = (_partnerId, _orderLine) => {
     console.log('Fetching order totals')
@@ -162,6 +163,10 @@ export default function NewOrderView() {
     setNotes(event.target.value);
   };
 
+  const handleChangeClientOrderRef = (event) => {
+    setClientOrderRef(event.target.value);
+  };
+
   const handleCreateOrder = () => {
     setLoading(true); // Set loading to true when authentication process starts
     console.log('Creating an order')
@@ -178,6 +183,7 @@ export default function NewOrderView() {
         partner_id: partner.id,
         order_line: orderLinePrepped,
         x_studio_notes: notes,
+        client_order_ref: clientOrderRef,
       }
     };
     console.log('Request body', requestBody);
@@ -283,6 +289,17 @@ export default function NewOrderView() {
           />
         </Grid>
       </Grid>
+      <div style={{ margin: '16px 0' }} />
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6} lg={6}>
+          <TextField
+            label="PO Number"
+            value={clientOrderRef}
+            fullWidth
+            onChange={handleChangeClientOrderRef}
+          />
+        </Grid>
+      </Grid>      
       <div style={{ margin: '16px 0' }} />
       <LoadingButton
         fullWidth
