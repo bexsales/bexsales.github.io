@@ -62,6 +62,7 @@ export default function OrderDetailView({
   const [productUnitPrices, setProductUnitPrices] = useState({})
   const [subTotal, setSubTotal] = useState(0);
   const [total, setTotal] = useState(0);
+  const [totalProductQty, setTotalProductQty] = useState(0);
 
   const [notes, setNotes] = useState('');
   const [clientOrderRef, setClientOrderRef] = useState('');
@@ -107,6 +108,8 @@ export default function OrderDetailView({
 
   useEffect(() => {
     handleGetOrderTotals(partner, orderLine);
+    const _totalProductQty = orderLine.reduce((acc, curr) => acc + curr[2].product_uom_qty, 0);
+    setTotalProductQty(_totalProductQty);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [partner, orderLine]); 
 
@@ -348,6 +351,7 @@ export default function OrderDetailView({
         </Table>
       </TableContainer>
       <div style={{ margin: '16px 0' }} />
+      <Typography variant="body1" fontWeight="bold">Total Product Qty: {totalProductQty}</Typography>
       <Typography variant="body1" fontWeight="bold">Subtotal: {formatToDollars(subTotal)}</Typography>
       <Typography variant="body1" fontWeight="bold">Total: {formatToDollars(total)}</Typography>
       <div style={{ margin: '16px 0' }} />

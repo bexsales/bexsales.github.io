@@ -13,7 +13,7 @@ export default function AppPage() {
   return (
     <>
       <Helmet>
-        <title> Dashboard | Minimal UI </title>
+        <title> Dashboard | BEX Sales </title>
       </Helmet>
 
       <AppView />

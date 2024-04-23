@@ -83,7 +83,7 @@ export default function LoginView() {
       <Stack spacing={3}>
         <TextField 
           name="identifier" 
-          label="Email address"
+          label="Username"
           value={formData.identifier}
           onChange={handleInputChange} 
         />

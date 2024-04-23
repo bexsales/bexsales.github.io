@@ -13,7 +13,7 @@ export default function ProductsPage() {
   return (
     <>
       <Helmet>
-        <title> Products | Minimal UI </title>
+        <title> Products | BEX Sales </title>
       </Helmet>
 
       <ProductView showTitle/>

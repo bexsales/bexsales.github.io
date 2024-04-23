@@ -13,7 +13,7 @@ export default function BlogPage() {
   return (
     <>
       <Helmet>
-        <title> Blog | Minimal UI </title>
+        <title> Blog | BEX Sales </title>
       </Helmet>
 
       <BlogView />
