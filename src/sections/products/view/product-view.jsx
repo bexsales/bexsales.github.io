@@ -154,7 +154,8 @@ export default function ProductView({
                   { id: 'category', label: 'Category' },
                   { id: 'type', label: 'Type' },
                   { id: 'lst_price', label: 'Sale Price' },
-                  { id: 'description_sale', label: 'Description' }
+                  { id: 'description_sale', label: 'Description' },
+                  { id: 'attributes', label: 'Attributes' }
                 ]}
               />
               <TableBody>
@@ -170,6 +171,7 @@ export default function ProductView({
                       type={row.type}
                       lst_price={row.lst_price}
                       description_sale={row.description_sale}
+                      attributes={row.product_template_attribute_value_ids.map((i) => `${i.attribute}:${i.name}`)}
                       onSelect={onSelect}
                     />
                   ))}

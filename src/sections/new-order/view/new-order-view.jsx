@@ -17,6 +17,7 @@ import {
   Stack, 
   Table,
   Paper,  
+  Chip,
   TableRow,
   TableBody,
   TableCell,
@@ -155,6 +156,7 @@ export default function NewOrderView() {
       lst_price: product.lst_price,
       invoice_policy: product.invoice_policy,
       description_sale: product.description_sale,
+      attributes: product.attributes,
       sale_ok: product.sale_ok,
       purchase_ok: product.purchase_ok,
       sales_count: product.sales_count,
@@ -246,6 +248,7 @@ export default function NewOrderView() {
           <TableHead>
             <TableRow>
               <TableCell>Product</TableCell>
+              <TableCell>Attributes</TableCell>
               <TableCell>Unit Price</TableCell>
               <TableCell>Qty</TableCell>
               <TableCell>Subtotal</TableCell>
@@ -256,6 +259,11 @@ export default function NewOrderView() {
             {orderLine.map((item, index) => (
               <TableRow key={index}>
                 <TableCell>[{item.default_code}] {item.name}</TableCell>
+                <TableCell>
+                  {item.attributes.map((attribute, ind) => (
+                    <Chip key={ind} label={attribute} variant="outlined" />
+                  ))}
+                </TableCell>
                 <TableCell>{formatToDollars(productUnitPrices[item.id])}</TableCell>
                 <TableCell>
                   <TextField

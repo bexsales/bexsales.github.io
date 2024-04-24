@@ -14,6 +14,7 @@ import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { 
   Grid,
+  Chip,
   Stack, 
   Table,
   Paper,  
@@ -238,7 +239,8 @@ export default function OrderDetailView({
             line_id: line.id,
             id: line.product_id.id,
             name: line.name,
-            product_uom_qty: line.product_uom_qty
+            product_uom_qty: line.product_uom_qty,
+            attributes: line.product_id.attributes.map((i) => `${i.attribute}:${i.name}`)
           }
         ]
       )
@@ -276,7 +278,8 @@ export default function OrderDetailView({
     setOrderLine([...orderLine,[0, 0, {
       id: product.id,
       name: `[${product.default_code}] ${product.name}`,
-      product_uom_qty: 1
+      product_uom_qty: 1,
+      attributes: product.attributes
     }]]);
   }; 
   
@@ -320,6 +323,7 @@ export default function OrderDetailView({
           <TableHead>
             <TableRow>
               <TableCell>Product</TableCell>
+              <TableCell>Attributes</TableCell>
               <TableCell>Unit Price</TableCell>
               <TableCell>Qty</TableCell>
               <TableCell>Subtotal</TableCell>
@@ -330,6 +334,11 @@ export default function OrderDetailView({
             {orderLine.map((item, index) => (
               <TableRow key={index}>
                 <TableCell>{item[2].name}</TableCell>
+                <TableCell>
+                  {item[2].attributes.map((attribute, ind) => (
+                    <Chip key={ind} label={attribute} variant="outlined" />
+                  ))}
+                </TableCell>
                 <TableCell>{formatToDollars(productUnitPrices[item[2].id])}</TableCell>
                 <TableCell>
                   <TextField

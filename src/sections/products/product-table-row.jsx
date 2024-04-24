@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 
+import Chip from '@mui/material/Chip';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 
@@ -13,6 +14,7 @@ export default function ProductTableRow({
   type,
   lst_price,
   description_sale,
+  attributes,
   onSelect
 }) {
 
@@ -27,7 +29,8 @@ export default function ProductTableRow({
       category,
       type,
       lst_price,
-      description_sale
+      description_sale,
+      attributes
     })}>
 
       <TableCell>{default_code}</TableCell>
@@ -36,6 +39,11 @@ export default function ProductTableRow({
       <TableCell>{type}</TableCell>
       <TableCell>{formatToDollars(lst_price)}</TableCell>
       <TableCell>{description_sale}</TableCell>
+      <TableCell>
+        {attributes.map((attribute, index) => (
+          <Chip key={index} label={attribute} variant="outlined" />
+        ))}
+      </TableCell>
 
     </TableRow>
   );
@@ -49,5 +57,6 @@ ProductTableRow.propTypes = {
   type: PropTypes.any,
   lst_price: PropTypes.any,
   description_sale: PropTypes.any,
+  attributes: PropTypes.arrayOf(PropTypes.string),
   onSelect: PropTypes.func,
 };
