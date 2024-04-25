@@ -175,6 +175,7 @@ export default function OrderView() {
                       amount_total={row.amount_total}
                       state={row.state}
                       x_studio_notes={row.x_studio_notes}
+                      client_order_ref={row.client_order_ref}
                       handleClick={(event) => handleClick(event, row.id)}
                     />
                   ))}
