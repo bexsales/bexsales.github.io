@@ -112,6 +112,12 @@ export default function NewOrderView() {
   const handleQuantityChange = (index, newQuantity) => {
     const updatedOrderLine = orderLine.map((item, idx) => {
       if (idx === index) {
+        console.log(item)
+        console.log(newQuantity)
+        if ( item.qty_available < newQuantity) {
+          alert('Quantity available is insufficient.');
+          return item;
+        }
         return { ...item, product_uom_qty: newQuantity !== 0 ? Number(newQuantity) : 0 };
       }
       return item;
@@ -147,21 +153,26 @@ export default function NewOrderView() {
   const handleSelectedProduct = (product) => {
     console.log('Adding order line')
     console.log(product)
-    setOrderLine([...orderLine, {
-      id: product.id,
-      name: product.name,
-      default_code: product.default_code,
-      category: product.category,
-      type: product.type,
-      lst_price: product.lst_price,
-      invoice_policy: product.invoice_policy,
-      description_sale: product.description_sale,
-      attributes: product.attributes,
-      sale_ok: product.sale_ok,
-      purchase_ok: product.purchase_ok,
-      sales_count: product.sales_count,
-      product_uom_qty: 1
-    }]);
+    if ( product.qty_available < 1 ) {
+      alert('Cannot add product lines with 0 qty available');
+    } else {
+      setOrderLine([...orderLine, {
+        id: product.id,
+        name: product.name,
+        default_code: product.default_code,
+        category: product.category,
+        type: product.type,
+        lst_price: product.lst_price,
+        invoice_policy: product.invoice_policy,
+        description_sale: product.description_sale,
+        attributes: product.attributes,
+        sale_ok: product.sale_ok,
+        purchase_ok: product.purchase_ok,
+        sales_count: product.sales_count,
+        product_uom_qty: 1,
+        qty_available: product.qty_available
+      }]);
+    }
   };
 
   const handleChangeNotes = (event) => {
@@ -250,6 +261,7 @@ export default function NewOrderView() {
               <TableCell>Product</TableCell>
               <TableCell>Attributes</TableCell>
               <TableCell>Unit Price</TableCell>
+              <TableCell>Qty Available</TableCell>
               <TableCell>Qty</TableCell>
               <TableCell>Subtotal</TableCell>
               <TableCell/>
@@ -265,6 +277,7 @@ export default function NewOrderView() {
                   ))}
                 </TableCell>
                 <TableCell>{formatToDollars(productUnitPrices[item.id])}</TableCell>
+                <TableCell>{item.qty_available}</TableCell>
                 <TableCell>
                   <TextField
                     type="number"
