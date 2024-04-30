@@ -114,7 +114,8 @@ export default function NewOrderView() {
       if (idx === index) {
         console.log(item)
         console.log(newQuantity)
-        if ( item.qty_available < newQuantity) {
+        const blacklist = ['consu', 'service']
+        if ( (item.qty_available < newQuantity) && (!blacklist.includes(item.type))) {
           alert('Quantity available is insufficient.');
           return item;
         }
@@ -153,7 +154,8 @@ export default function NewOrderView() {
   const handleSelectedProduct = (product) => {
     console.log('Adding order line')
     console.log(product)
-    if ( product.qty_available < 1 ) {
+    const blacklist = ['consu', 'service']
+    if ( (product.qty_available < 1) && ((!blacklist.includes(product.type)))) {
       alert('Cannot add product lines with 0 qty available');
     } else {
       setOrderLine([...orderLine, {

@@ -201,6 +201,11 @@ export default function OrderDetailView({
     const updatedOrderLine = orderLine.map((item, idx) => {
       if (idx === index) {
         console.log('handle qty change', item)
+        const blacklist = ['consu', 'service']
+        if ( (item[2].qty_available < newQuantity) && (!blacklist.includes(item[2].type))) {
+          alert('Quantity available is insufficient.');
+          return item;
+        }
         return [item[0], item[1], { ...item[2], product_uom_qty: newQuantity !== 0 ? Number(newQuantity) : 0 }];
       }
       return item;
@@ -240,7 +245,9 @@ export default function OrderDetailView({
             id: line.product_id.id,
             name: line.name,
             product_uom_qty: line.product_uom_qty,
-            attributes: line.product_id.attributes.map((i) => `${i.attribute}:${i.name}`)
+            attributes: line.product_id.attributes.map((i) => `${i.attribute}:${i.name}`),
+            qty_available: line.product_id.qty_available,
+            type: line.product_id.type
           }
         ]
       )
@@ -275,12 +282,18 @@ export default function OrderDetailView({
   const handleSelectedProduct = (product) => {
     console.log('Adding order line')
     console.log(product)
-    setOrderLine([...orderLine,[0, 0, {
-      id: product.id,
-      name: `[${product.default_code}] ${product.name}`,
-      product_uom_qty: 1,
-      attributes: product.attributes
-    }]]);
+    const blacklist = ['consu', 'service']
+    if ( (product.qty_available < 1) && (!blacklist.includes(product.type)) ) {
+      alert('Cannot add product lines with 0 qty available');
+    } else {
+      setOrderLine([...orderLine,[0, 0, {
+        id: product.id,
+        name: `[${product.default_code}] ${product.name}`,
+        product_uom_qty: 1,
+        attributes: product.attributes,
+        qty_available: product.qty_available
+      }]]);
+    }
   }; 
   
   const renderForm = (
@@ -325,6 +338,7 @@ export default function OrderDetailView({
               <TableCell>Product</TableCell>
               <TableCell>Attributes</TableCell>
               <TableCell>Unit Price</TableCell>
+              <TableCell>Qty Available</TableCell>
               <TableCell>Qty</TableCell>
               <TableCell>Subtotal</TableCell>
               <TableCell/>
@@ -340,6 +354,7 @@ export default function OrderDetailView({
                   ))}
                 </TableCell>
                 <TableCell>{formatToDollars(productUnitPrices[item[2].id])}</TableCell>
+                <TableCell>{item[2].qty_available}</TableCell>
                 <TableCell>
                   <TextField
                     type="number"
