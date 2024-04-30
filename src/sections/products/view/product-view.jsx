@@ -155,7 +155,9 @@ export default function ProductView({
                   { id: 'type', label: 'Type' },
                   { id: 'lst_price', label: 'Sale Price' },
                   { id: 'description_sale', label: 'Description' },
-                  { id: 'attributes', label: 'Attributes' }
+                  { id: 'attributes', label: 'Attributes' },
+                  { id: 'virtual_available', label: 'Forecasted Quantity' },
+                  { id: 'qty_available', label: 'Quantity on Hand' }
                 ]}
               />
               <TableBody>
@@ -172,6 +174,8 @@ export default function ProductView({
                       lst_price={row.lst_price}
                       description_sale={row.description_sale}
                       attributes={row.product_template_attribute_value_ids.map((i) => `${i.attribute}:${i.name}`)}
+                      virtual_available={row.virtual_available}
+                      qty_available={row.qty_available}
                       onSelect={onSelect}
                     />
                   ))}

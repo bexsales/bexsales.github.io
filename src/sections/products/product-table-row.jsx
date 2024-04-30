@@ -15,6 +15,8 @@ export default function ProductTableRow({
   lst_price,
   description_sale,
   attributes,
+  virtual_available,
+  qty_available,
   onSelect
 }) {
 
@@ -30,7 +32,9 @@ export default function ProductTableRow({
       type,
       lst_price,
       description_sale,
-      attributes
+      attributes,
+      virtual_available,
+      qty_available
     })}>
 
       <TableCell>{default_code}</TableCell>
@@ -44,6 +48,8 @@ export default function ProductTableRow({
           <Chip key={index} label={attribute} variant="outlined" />
         ))}
       </TableCell>
+      <TableCell>{virtual_available}</TableCell>
+      <TableCell>{qty_available}</TableCell>
 
     </TableRow>
   );
@@ -58,5 +64,7 @@ ProductTableRow.propTypes = {
   lst_price: PropTypes.any,
   description_sale: PropTypes.any,
   attributes: PropTypes.arrayOf(PropTypes.string),
+  virtual_available: PropTypes.any,
+  qty_available: PropTypes.any,
   onSelect: PropTypes.func,
 };
