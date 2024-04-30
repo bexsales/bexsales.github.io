@@ -48,7 +48,6 @@ export default function ProductTableRow({
           <Chip key={index} label={attribute} variant="outlined" />
         ))}
       </TableCell>
-      <TableCell>{virtual_available}</TableCell>
       <TableCell>{qty_available}</TableCell>
 
     </TableRow>

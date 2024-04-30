@@ -156,7 +156,6 @@ export default function ProductView({
                   { id: 'lst_price', label: 'Sale Price' },
                   { id: 'description_sale', label: 'Description' },
                   { id: 'attributes', label: 'Attributes' },
-                  { id: 'virtual_available', label: 'Forecasted Quantity' },
                   { id: 'qty_available', label: 'Quantity on Hand' }
                 ]}
               />
