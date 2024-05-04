@@ -19,7 +19,14 @@ import AppConversionRates from '../app-conversion-rates';
 
 export default function AppView() {
 
-  const [teamMetrics, setTeamMetrics] = useState({});
+  const [weeklyTotal, setWeeklyTotal] = useState(0);
+
+  const [totalsByMonth, setTotalsByMonth] = useState({});
+
+  const [topCustomers, setTopCustomers] = useState({});
+
+  const [latestOrders, setLatestOrders] = useState([]);
+
 
   useEffect(() => {
     fetchTeamMetrics();
@@ -37,7 +44,10 @@ export default function AppView() {
     })
     .then(response => {
       console.log(response.data);
-      setTeamMetrics(response.data.data);
+      setWeeklyTotal(response.data.data.weekly_total);
+      setTotalsByMonth(response.data.data.totals_by_month);
+      setTopCustomers(response.data.data.top_customers);
+      setLatestOrders(response.data.data.latest_orders);
     })
     .catch(error => {
       console.error('Error fetching customers:', error);
@@ -57,7 +67,7 @@ export default function AppView() {
         <Grid xs={12} sm={6} md={6}>
           <AppWidgetSummary
             title="Weekly Sales"
-            total={teamMetrics.weekly_total ? teamMetrics.weekly_total : '0'}
+            total={weeklyTotal || '0'}
             color="success"
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
           />
@@ -68,7 +78,7 @@ export default function AppView() {
             title="Order Totals By Month"
             subheader=""
             chart={{
-              labels: teamMetrics.totals_by_month ? Object.keys(teamMetrics.totals_by_month) : [
+              labels: totalsByMonth ? Object.keys(totalsByMonth) : [
                 '01/01/2003',
                 '02/01/2003',
                 '03/01/2003',
@@ -87,7 +97,7 @@ export default function AppView() {
                   name: '',
                   type: 'line',
                   fill: 'solid',
-                  data: teamMetrics.totals_by_month ? Object.values(teamMetrics.totals_by_month) : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  data: totalsByMonth ? Object.values(totalsByMonth) : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 },
               ],
             }}
@@ -99,17 +109,17 @@ export default function AppView() {
             title="Total By Customer"
             subheader=""
             chart={{
-              series: teamMetrics.top_customers ? Object.entries(teamMetrics.top_customers).filter(([label, value]) => value !== 0).map(([label, value]) => ({ label, value })): [
-                { label: 'Italy', value: 400 },
-                { label: 'Japan', value: 430 },
-                { label: 'China', value: 448 },
-                { label: 'Canada', value: 470 },
-                { label: 'France', value: 540 },
-                { label: 'Germany', value: 580 },
-                { label: 'South Korea', value: 690 },
-                { label: 'Netherlands', value: 1100 },
-                { label: 'United States', value: 1200 },
-                { label: 'United Kingdom', value: 1380 },
+              series: topCustomers ? Object.entries(topCustomers).filter(([label, value]) => value !== 0).map(([label, value]) => ({ label, value })): [
+                { label: '', value: 0 },
+                { label: '', value: 0 },
+                { label: '', value: 0 },
+                { label: '', value: 0 },
+                { label: '', value: 0 },
+                { label: '', value: 0 },
+                { label: '', value: 0 },
+                { label: '', value: 0 },
+                { label: '', value: 0 },
+                { label: '', value: 0 },
               ],
             }}
           />
@@ -117,18 +127,12 @@ export default function AppView() {
 
         <Grid xs={12} md={6} lg={4}>
           <AppOrderTimeline
-            title="Order Timeline"
-            list={[...Array(5)].map((_, index) => ({
+            title="Latest Confirmed Orders"
+            list={latestOrders.map((_, index) => ({
               id: faker.string.uuid(),
-              title: [
-                '1983, orders, $4220',
-                '12 Invoices have been paid',
-                'Order #37745 from September',
-                'New order placed #XF-2356',
-                'New order placed #XF-2346',
-              ][index],
+              title: latestOrders.map(item => item.name)[index],
               type: `order${index + 1}`,
-              time: faker.date.past(),
+              time: latestOrders.map(item => item.date_order)[index],
             }))}
           />
         </Grid>
