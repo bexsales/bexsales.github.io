@@ -99,7 +99,18 @@ export default function AppView() {
             title="Total By Customer"
             subheader=""
             chart={{
-              series: Object.entries(teamMetrics.top_customers).filter(([label, value]) => value !== 0).map(([label, value]) => ({ label, value })),
+              series: teamMetrics.top_customers ? Object.entries(teamMetrics.top_customers).filter(([label, value]) => value !== 0).map(([label, value]) => ({ label, value })): [
+                { label: 'Italy', value: 400 },
+                { label: 'Japan', value: 430 },
+                { label: 'China', value: 448 },
+                { label: 'Canada', value: 470 },
+                { label: 'France', value: 540 },
+                { label: 'Germany', value: 580 },
+                { label: 'South Korea', value: 690 },
+                { label: 'Netherlands', value: 1100 },
+                { label: 'United States', value: 1200 },
+                { label: 'United Kingdom', value: 1380 },
+              ],
             }}
           />
         </Grid>
