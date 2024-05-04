@@ -128,11 +128,11 @@ export default function AppView() {
         <Grid xs={12} md={6} lg={4}>
           <AppOrderTimeline
             title="Latest Confirmed Orders"
-            list={latestOrders.map((_, index) => ({
+            list={latestOrders.map((order, index) => ({
               id: faker.string.uuid(),
-              title: latestOrders.map(item => item.name)[index],
-              type: `order${index + 1}`,
-              time: latestOrders.map(item => item.date_order)[index],
+              title: order.name,
+              type: `order${index + 1}`
+              // time: order.date_order,
             }))}
           />
         </Grid>
