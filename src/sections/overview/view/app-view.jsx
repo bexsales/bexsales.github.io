@@ -131,8 +131,8 @@ export default function AppView() {
             list={latestOrders.map((order, index) => ({
               id: faker.string.uuid(),
               title: order.name,
-              type: `order${index + 1}`
-              // time: order.date_order,
+              type: `order${index + 1}`,
+              time: order.date_order,
             }))}
           />
         </Grid>
