@@ -4,9 +4,10 @@ import axios from 'axios';
 import Cookies from 'js-cookie'; // Import js-cookie for managing cookies
 
 // import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 import Card from '@mui/material/Card';
+import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
@@ -62,6 +63,84 @@ export default function NewOrderView() {
 
   const [notes, setNotes] = useState('');
   const [clientOrderRef, setClientOrderRef] = useState('');
+
+  const [fileName, setFileName] = useState('');
+  const fileReader = new FileReader();
+  const fileInputRef = useRef(null);
+
+
+  function csvToArray(str, delimiter = ",") {
+    let headers = str.slice(0, str.indexOf("\n")).split(delimiter);
+    headers = headers.map((h) => h.replace('\n', '').replace('\r', ''));
+    const rows = str.slice(str.indexOf("\n") + 1).split("\n");
+    const arr = rows.map( (row) => {
+        const values = row.split(delimiter).map((r) => r.replace('\n', '').replace('\r', ''));
+        const el = headers.reduce((object, header, index) => {
+            object[header] = values[index];
+            return object;
+        }, {});
+        return el;
+    });
+
+    return arr;
+  }
+
+  const handleFileUploadButtonClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    setFileName(file.name);
+    fileReader.onload = async (f) => { 
+      const csvArray = csvToArray(f.target.result);
+      csvArray.pop();
+      console.log(csvArray);
+      
+      const productArr = [];
+      
+      const promises = csvArray.map((item) => {
+        const requestUrl = `${config.baseURL}/api-proxy/proxy?method=get&resource=products&exact_match=true&name=${item.sku}`;
+        console.log(requestUrl);
+        
+        return axios.get(requestUrl, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get('jwt')}`, // Replace with your actual JWT token
+          }
+        })
+        .then(response => {
+          console.log(response.data.data);
+          if (Array.isArray(response.data.data) && response.data.data.length === 0) {
+            alert(`There appears to be an issue with your CSV file. Please review and correct it. Product ${item.sku} not found.`);
+          } else {
+            const product = response.data.data[0]
+            product.category = product.categ_id.name;
+            product.attributes = product.product_template_attribute_value_ids.map((i) => `${i.attribute}:${i.name}`);
+            product.product_uom_qty = Number(item.qty);
+            productArr.push(product);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching products:', error);
+        });
+      });
+  
+      // Wait for all promises to complete
+      await Promise.all(promises);
+  
+      // Now you can check the length of the productArr
+      console.log(`Total products fetched: ${productArr.length}`);
+      if (productArr.length === csvArray.length) {
+        console.log('Setting products');
+        console.log(productArr);
+        productArr.forEach(prod => {
+          handleSelectedProduct(prod, prod.product_uom_qty);
+        });
+      }
+      e.target.value = null; 
+    };
+    fileReader.readAsText(file);
+  };
 
   const handleGetOrderTotals = (_partnerId, _orderLine) => {
     console.log('Fetching order totals')
@@ -151,29 +230,33 @@ export default function NewOrderView() {
     })
   }; 
 
-  const handleSelectedProduct = (product) => {
+  // add new parameter for checking the quantity because it may come from CSV
+  const handleSelectedProduct = (product, qty) => {
     console.log('Adding order line')
     console.log(product)
     const blacklist = ['consu', 'service']
     if ( (product.qty_available < 1) && ((!blacklist.includes(product.type)))) {
-      alert('Cannot add product lines with 0 qty available');
+      alert(`Cannot add product lines with 0 qty available: SKU ${product.default_code}`);
     } else {
-      setOrderLine([...orderLine, {
-        id: product.id,
-        name: product.name,
-        default_code: product.default_code,
-        category: product.category,
-        type: product.type,
-        lst_price: product.lst_price,
-        invoice_policy: product.invoice_policy,
-        description_sale: product.description_sale,
-        attributes: product.attributes,
-        sale_ok: product.sale_ok,
-        purchase_ok: product.purchase_ok,
-        sales_count: product.sales_count,
-        product_uom_qty: 1,
-        qty_available: product.qty_available
-      }]);
+      setOrderLine(prevOrderLine => [
+        ...prevOrderLine,
+        {
+          id: product.id,
+          name: product.name,
+          default_code: product.default_code,
+          category: product.category,
+          type: product.type,
+          lst_price: product.lst_price,
+          invoice_policy: product.invoice_policy,
+          description_sale: product.description_sale,
+          attributes: product.attributes,
+          sale_ok: product.sale_ok,
+          purchase_ok: product.purchase_ok,
+          sales_count: product.sales_count,
+          product_uom_qty: qty || 1,
+          qty_available: product.qty_available
+        }
+      ]);
     }
   };
 
@@ -255,6 +338,21 @@ export default function NewOrderView() {
       <IconButton>
         <ProductPopupModal onSelect={handleSelectedProduct}/>
       </IconButton>
+      <input
+        type="file"
+        accept=".csv"
+        onChange={handleFileUpload}
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+      />
+      <Button variant="contained" color="primary" onClick={handleFileUploadButtonClick}>
+        Upload CSV
+      </Button>
+      {fileName && (
+        <Typography variant="body1" style={{ marginTop: '10px' }}>
+          Selected file: {fileName}
+        </Typography>
+      )}
       <div style={{ margin: '16px 0' }} />
       <TableContainer component={Paper}>
         <Table>
