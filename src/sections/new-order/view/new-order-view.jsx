@@ -234,10 +234,20 @@ export default function NewOrderView() {
   const handleSelectedProduct = (product, qty) => {
     console.log('Adding order line')
     console.log(product)
+    let is_duplicate = false;
+    orderLine.forEach(item => {
+      if (item.id === product.id) {
+        is_duplicate = true;
+      }
+    });
     const blacklist = ['consu', 'service']
     if ( (product.qty_available < 1) && ((!blacklist.includes(product.type)))) {
       alert(`Cannot add product lines with 0 qty available: SKU ${product.default_code}`);
-    } else {
+    } 
+    else if ( is_duplicate ) {
+      alert(`Product has already been added: SKU ${product.default_code}`);
+    }
+    else {
       setOrderLine(prevOrderLine => [
         ...prevOrderLine,
         {
