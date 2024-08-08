@@ -28,6 +28,8 @@ import UserTableToolbar from '../user-table-toolbar';
 export default function CustomerView({
   showTitle,
   onSelect,
+  filterTypeOption,
+  filterParentContactOption
 }) {
   const [customers, setCustomers] = useState([]);
 
@@ -41,6 +43,12 @@ export default function CustomerView({
 
   const [filterName, setFilterName] = useState('');
 
+  // eslint-disable-next-line no-unused-vars
+  const [filterType, setFiltertype] = useState(filterTypeOption);
+
+  // eslint-disable-next-line no-unused-vars
+  const [filterParentContact, setFilterParentContact] = useState(filterParentContactOption);
+
   const [rowsPerPage, setRowsPerPage] = useState(25);
 
   const [totalCount, setTotalCount] = useState(0);
@@ -49,6 +57,8 @@ export default function CustomerView({
   const rowsPerPageRef = useRef(rowsPerPage);
   const pageRef = useRef(page);
   const filterNameRef = useRef(filterName);
+  const filterTypeRef = useRef(filterType);
+  const filterParentContactRef = useRef(filterParentContact);
 
   useEffect(() => {
     // Fetch customers from the API
@@ -56,16 +66,24 @@ export default function CustomerView({
     rowsPerPageRef.current = rowsPerPage;
     pageRef.current = page;
     filterNameRef.current = filterName;
-    fetchCustomers(pageRef.current, rowsPerPageRef.current, customersRef.current, filterNameRef.current);
+    filterTypeRef.current = filterType;
+    filterParentContactRef.current = filterParentContact;
+    fetchCustomers(pageRef.current, rowsPerPageRef.current, customersRef.current, filterNameRef.current, filterTypeRef.current, filterParentContactRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchCustomers = (pg, lm, cst, nm) => {
+  const fetchCustomers = (pg, lm, cst, nm, ft, pc) => {
     console.log('Fetching Customers')
     const normalizedPageNumber = pg + 1;
     let requestUrl = `${config.baseURL}/api-proxy/proxy?method=get&resource=customers&page=${normalizedPageNumber}&page_size=${lm}`
     if (nm) {
       requestUrl += `&name=${nm}`;
+    }
+    if (ft) {
+      requestUrl += `&type=${ft}`;
+    }
+    if (pc) {
+      requestUrl += `&parent_contact_id=${pc}`;
     }
     console.log(requestUrl);
     axios.get(requestUrl, {
@@ -97,7 +115,7 @@ export default function CustomerView({
     const numberOfRecords = rowsPerPage * newPage;
     if (numberOfRecords > maxRecord) {
       setMaxRecord(numberOfRecords);
-      fetchCustomers(newPage, rowsPerPage, customers, filterName)
+      fetchCustomers(newPage, rowsPerPage, customers, filterName, filterType, filterParentContact);
     }
 
   };
@@ -119,7 +137,7 @@ export default function CustomerView({
 
   const handleClickSearch = (event) => {
     setPage(0);
-    fetchCustomers(page, rowsPerPage, [], filterName)
+    fetchCustomers(page, rowsPerPage, [], filterName, filterType, filterParentContact);
   };
 
   const notFound = !customers.length && !!filterName;
@@ -208,4 +226,6 @@ export default function CustomerView({
 CustomerView.propTypes = {
   showTitle: PropTypes.bool,
   onSelect: PropTypes.func,
+  filterTypeOption: PropTypes.string,
+  filterParentContactOption: PropTypes.number
 };
