@@ -29,6 +29,7 @@ import Iconify from 'src/components/iconify';
 
 import ProductPopupModal from '../edit-product-popup';
 import CustomerPopupModal from '../edit-customer-popup';
+import DeliveryPopupModal from '../edit-delivery-popup';
 import CancelOrderPopupModal from '../cancel-order-popup';
 
 // ----------------------------------------------------------------------
@@ -55,6 +56,19 @@ export default function OrderDetailView({
     mobile: '',
     email: ''
   });
+
+  const [delivery, setDelivery] = useState({
+    id: 0,
+    name: '',
+    street: '',
+    city: '',
+    state: '',
+    country: '',
+    zip: '',
+    phone: '',
+    mobile: '',
+    email: ''
+  }); 
 
   const [orderLine, setOrderLine] = useState([]);
 
@@ -156,7 +170,9 @@ export default function OrderDetailView({
         partner_id: partner.id,
         order_line: _combinedOrderLines,
         x_studio_notes: notes,
-        client_order_ref: clientOrderRef
+        client_order_ref: clientOrderRef,
+        // Include delivery_id if it exists
+        ...(delivery.id && { partner_shipping_id: delivery.id })
       }
     };
     console.log('Request body', requestBody);
@@ -234,6 +250,7 @@ export default function OrderDetailView({
       console.log(response.data.data);
       setOrderName(response.data.data.name);
       setPartner(response.data.data.customer_id);
+      setDelivery(response.data.data.partner_shipping_id);
       setNotes(response.data.data.x_studio_notes);
       setClientOrderRef(response.data.data.client_order_ref ? response.data.data.client_order_ref : '');
       const _orderLinesPrepped = response.data.data.order_line.map((line) => 
@@ -276,6 +293,37 @@ export default function OrderDetailView({
       phone: customer.phone,
       mobile: customer.mobile,
       email: customer.email
+    });
+  
+    // Clear the delivery information when the partner changes
+    setDelivery({
+      id: 0,
+      name: '',
+      street: '',
+      city: '',
+      state: '',
+      country: '',
+      zip: '',
+      phone: '',
+      mobile: '',
+      email: ''
+    });
+  }; 
+
+  const handleSelectedDelivery = (_delivery) => {
+    console.log('Setting order partner')
+    console.log(_delivery)
+    setDelivery({
+      id: _delivery.id,
+      name: _delivery.name,
+      street: _delivery.street,
+      city: _delivery.city,
+      state: _delivery.state,
+      country: _delivery.country,
+      zip: _delivery.zip,
+      phone: _delivery.phone,
+      mobile: _delivery.mobile,
+      email: _delivery.email
     })
   }; 
 
@@ -327,6 +375,41 @@ export default function OrderDetailView({
           <Typography variant="body1"><b>Email:</b> {partner.email}</Typography>
         </>
       )}
+      <div style={{ margin: '16px 0' }} />
+      {partner.name && (
+        <Stack spacing={3} direction="row" alignItems="center">
+          <TextField 
+            fullWidth
+            name="partner_shipping_id" 
+            label="Delivery Address"
+            value={delivery.name}
+            InputProps={{
+              readOnly: true,
+              endAdornment: (
+                <IconButton>
+                  <DeliveryPopupModal 
+                    onSelect={handleSelectedDelivery}
+                    filterParentContactOption={partner.id}/>
+                </IconButton>
+              )
+            }}
+          />
+        </Stack>
+      )}
+      {/* Display partner address and phone */}
+      {delivery.name && ( // Display error message if authError state is not null
+        <>
+          <div style={{ margin: '16px 0' }} />
+          <Typography variant="body1" fontWeight="bold">Address:</Typography>
+          <Typography variant="body1">{delivery.street}</Typography>
+          <Typography variant="body1">{delivery.city} {partner.state}</Typography>
+          <Typography variant="body1">{delivery.country} {partner.zip}</Typography>
+          <Typography variant="body1"><b>Phone:</b> {delivery.phone}</Typography>
+          <Typography variant="body1"><b>Mobile:</b> {delivery.mobile}</Typography>
+          <Typography variant="body1"><b>Email:</b> {delivery.email}</Typography>
+        </>
+      )}
+      <div style={{ margin: '16px 0' }} />
       <IconButton>
         <ProductPopupModal onSelect={handleSelectedProduct}/>
       </IconButton>
