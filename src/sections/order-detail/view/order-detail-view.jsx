@@ -28,6 +28,7 @@ import {
 import Iconify from 'src/components/iconify';
 
 import ProductPopupModal from '../edit-product-popup';
+import SendOrderPopupModal from '../send-order-popup';
 import CustomerPopupModal from '../edit-customer-popup';
 import DeliveryPopupModal from '../edit-delivery-popup';
 import CancelOrderPopupModal from '../cancel-order-popup';
@@ -89,7 +90,11 @@ export default function OrderDetailView({
   }, []);
 
   const handleCancelOrder = () => {
-    handleSaveOrder(true);
+    handleSaveOrder(true, false);
+  }
+
+  const handleSendOrder = () => {
+    handleSaveOrder(false, true);
   }
 
   const handleGetOrderTotals = (_partnerId, _orderLine) => {
@@ -136,7 +141,7 @@ export default function OrderDetailView({
     setClientOrderRef(event.target.value);
   };
 
-  const handleSaveOrder = (cancel) => {
+  const handleSaveOrder = (cancel, send) => {
     setLoading(true); // Set loading to true when authentication process starts
     console.log('Saving Order')
     let action = 'post';
@@ -171,6 +176,8 @@ export default function OrderDetailView({
         order_line: _combinedOrderLines,
         x_studio_notes: notes,
         client_order_ref: clientOrderRef,
+        // Conditionally include is_send if send is true
+        ...(send && { is_send: true }),
         // Include delivery_id if it exists
         ...(delivery.id && { partner_shipping_id: delivery.id })
       }
@@ -506,9 +513,14 @@ export default function OrderDetailView({
         <Typography variant="h4">Order {orderName} [{orderState}]</Typography>
         {/* Cancel Order Button */}
         {orderState === 'draft' && (
-          <CancelOrderPopupModal 
-            handleCancelOrder={handleCancelOrder}
-          />
+          <Stack direction="row" spacing={2}>
+            <CancelOrderPopupModal 
+              handleCancelOrder={handleCancelOrder}
+            />
+            <SendOrderPopupModal 
+              handleSendOrder={handleSendOrder}
+            />
+          </Stack>
         )}
       </Stack>
       {renderForm}
