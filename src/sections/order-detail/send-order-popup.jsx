@@ -28,13 +28,19 @@ export default function SendOrderPopupModal({ handleSendOrder }) {
 
   return (
     <Stack direction="row" alignItems="center">
-        <Typography variant="body1" sx={{ color: 'blue' }}>Email</Typography>
-        <IconButton
-            onClick={handleOpen}
-            sx={{ color: 'blue' }} // Set the color to red
-        >
-            <Iconify icon="mdi:send" /> {/* Replace with the appropriate close icon */}
-        </IconButton>
+        <Stack direction="column" alignItems="center" spacing={1}>
+            <IconButton
+                onClick={handleOpen}
+                sx={{
+                    color: 'blue',
+                    backgroundColor: '#ddf', // Light blue background
+                    '&:hover': { backgroundColor: '#bbf' } // Darker blue on hover
+                }}
+            >
+                <Iconify icon="mdi:send" />
+            </IconButton>
+            <Typography variant="caption" sx={{ color: 'blue' }}>Email</Typography>
+        </Stack>
         <Dialog 
             open={open}
             onClose={handleClose}

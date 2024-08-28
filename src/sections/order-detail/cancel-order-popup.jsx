@@ -28,13 +28,19 @@ export default function CancelOrderPopupModal({ handleCancelOrder }) {
 
   return (
     <Stack direction="row" alignItems="center">
-        <Typography variant="body1" sx={{ color: 'red' }}>Cancel</Typography>
-        <IconButton
-            onClick={handleOpen}
-            sx={{ color: 'red' }} // Set the color to red
-        >
-            <Iconify icon="eva:close-outline" /> {/* Replace with the appropriate close icon */}
-        </IconButton>
+        <Stack direction="column" alignItems="center" spacing={1}>
+            <IconButton
+                onClick={handleOpen}
+                sx={{
+                    color: 'red',
+                    backgroundColor: '#fdd', // Light blue background
+                    '&:hover': { backgroundColor: '#fbb' } // Darker blue on hover
+                }}
+            >
+                <Iconify icon="eva:close-outline" />
+            </IconButton>
+            <Typography variant="caption" sx={{ color: 'red' }}>Cancel</Typography>
+        </Stack>
         <Dialog 
             open={open}
             onClose={handleClose}
