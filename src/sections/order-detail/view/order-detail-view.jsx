@@ -510,9 +510,16 @@ export default function OrderDetailView({
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Order {orderName} [{orderState}]</Typography>
+        <Typography variant="h4">Order {orderName}   
+          <Chip
+            label={orderState}  // Directly use orderState for the label
+            color={orderState === 'cancel' ? 'danger' : 'primary'}  // Customize the color based on the state
+            variant="outlined"  // Optional: Change to solid if you prefer
+            style={{ marginLeft: '10px' }}
+          />
+        </Typography>
         {/* Cancel Order Button */}
-        {orderState === 'draft' && (
+        {(orderState === 'draft' || orderState === 'sent') && (
           <Stack direction="row" spacing={2}>
             <CancelOrderPopupModal 
               handleCancelOrder={handleCancelOrder}
