@@ -28,8 +28,8 @@ This architecture ensures efficient handling of sales activities while reducing 
 
 
 ### Steps  
-1. git clone https://github.com/your-repo/bex-salesrep-dashboard.git
+1. git clone git@github.com:bexsunglasses/bex-salesrep-backend.git
 2. cd bex-salesrep-dashboard
 3. yarn install
 4. yarn dev
-5. When ready to deploy: yarn build -> yarn deploy
+5. When ready to deploy: **yarn build** then **yarn deploy**
