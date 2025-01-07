@@ -1,46 +1,35 @@
-## Minimal [(Free version)](https://minimal-kit-react.vercel.app/)
+# BEX Salesrep Dashboard
 
-![license](https://img.shields.io/badge/license-MIT-blue.svg)
+The **BEX Salesrep Dashboard** is a frontend application designed to interact with the Strapi API, providing a seamless interface for sales representatives to manage and track their sales activities efficiently.  
 
-> Free React Admin Dashboard made with Material-UI components and React.
+## Features  
+- User-friendly dashboard tailored for sales representatives.  
+- Integration with the Strapi API for real-time data management.  
+- Ability to view, create, and update sales records.  
+- Optimized performance for handling large datasets.  
+- Secure authentication and role-based access.  
 
-![preview](public/assets/preview.jpg)
+## Technology Stack  
+- **Frontend**: Built using [React](https://reactjs.org/) (or specify if you're using another framework).  
+- **Backend**: Powered by the Strapi API.  
+- **Database**: MongoDB (via Strapi for user and sales data).  
 
-## Demo
+## Architecture Overview  
+The **BEX Salesrep Dashboard** operates as the frontend layer in the following architecture:  
 
-- [Dashboard Page](https://minimal-kit-react.vercel.app/)
-- [Users Page](https://minimal-kit-react.vercel.app/user)
-- [Products Page](https://minimal-kit-react.vercel.app/products)
-- [Blog Page](https://minimal-kit-react.vercel.app/blog)
-- [Login Page](https://minimal-kit-react.vercel.app/login)
-- [Not Found Page](https://minimal-kit-react.vercel.app/404)
+1. **Odoo**: The central ERP system for business processes.  
+2. **Strapi**: Acts as a middleware between the dashboard and Odoo, handling API requests.  
+3. **MongoDB**: Stores user and sales data for the dashboard via Strapi.  
 
-## Quick start
+### Flow:  
+Sales Representatives → **BEX Salesrep Dashboard** → Strapi → Odoo  
 
-- [Download from Github](https://github.com/minimal-ui-kit/material-kit-react/archive/refs/heads/main.zip) or clone the repo : `git clone https://github.com/minimal-ui-kit/material-kit-react.git`
-- Recommended `Node.js v18.x`.
-- **Install:** `yarn install`
-- **Start:** `yarn dev`
-- **Build:** `yarn build`
+This architecture ensures efficient handling of sales activities while reducing the cost of additional Odoo licenses.  
 
-## Upgrade to PRO Version
 
-| Minimal Free     | [Minimal Pro](https://material-ui.com/store/items/minimal-dashboard/) |
-| :--------------- | :-------------------------------------------------------------------- |
-| **6** Demo Pages | **70+** Demo Pages                                                    |
-| -                | Authentication with **Amplify**, **Auth0**, **JWT** and **Firebase**  |
-| -                | [+More components](https://minimals.cc/components)                    |
-| -                | Dark & light mode                                                     |
-| -                | Next.js version                                                       |
-| -                | TypeScript version (Standard Plus and Extended license)               |
-| -                | Design Figma File (Standard Plus and Extended license)                |
-| -                | Complete Users Flows                                                  |
-| -                | Learn more: [Package & License](https://docs.minimals.cc/package)     |
-
-## License
-
-Distributed under the MIT License. See [LICENSE](https://github.com/minimal-ui-kit/minimal.free/blob/main/LICENSE.md) for more information.
-
-## Contact us
-
-Email: support@minimals.cc
+### Steps  
+1. git clone https://github.com/your-repo/bex-salesrep-dashboard.git
+2. cd bex-salesrep-dashboard
+3. yarn install
+4. yarn dev
+5. When ready to deploy: yarn build -> yarn deploy
