@@ -560,6 +560,7 @@ export default function OrderDetailView({
             />
             <SendOrderPopupModal 
               handleSendOrder={handleSendOrder}
+              partner={partner}
             />
           </Stack>
         )}

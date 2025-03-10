@@ -15,7 +15,7 @@ import {
 
 import Iconify from 'src/components/iconify';
 
-export default function SendOrderPopupModal({ handleSendOrder }) {
+export default function SendOrderPopupModal({ handleSendOrder, partner }) {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => {
@@ -49,7 +49,7 @@ export default function SendOrderPopupModal({ handleSendOrder }) {
             <DialogTitle id="alert-dialog-title">Confirm Send</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                    Are you sure you want to send this order?
+                    Are you sure you want to send this order to <b>{partner.name} [{partner.email}]</b>?
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -67,4 +67,5 @@ export default function SendOrderPopupModal({ handleSendOrder }) {
 
 SendOrderPopupModal.propTypes = {
     handleSendOrder: PropTypes.func,
+    partner: PropTypes.any,
 };
