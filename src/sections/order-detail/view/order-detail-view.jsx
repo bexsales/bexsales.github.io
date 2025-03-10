@@ -4,7 +4,9 @@ import axios from 'axios';
 import Cookies from 'js-cookie'; // Import js-cookie for managing cookies
 
 import PropTypes from 'prop-types';
+import { Icon } from '@iconify/react';
 import { useState, useEffect } from 'react';
+import copyOutline from '@iconify-icons/eva/copy-outline';
 
 import Card from '@mui/material/Card';
 import Container from '@mui/material/Container';
@@ -82,6 +84,9 @@ export default function OrderDetailView({
 
   const [notes, setNotes] = useState('');
   const [clientOrderRef, setClientOrderRef] = useState('');
+
+  const [shipTrackingNumber, setShipTrackingNumber] = useState('');
+  const [shipDate, setShipDate] = useState('');
 
   useEffect(() => {
     // Fetch order details from the API
@@ -256,6 +261,8 @@ export default function OrderDetailView({
     .then(response => {
       console.log(response.data.data);
       setOrderName(response.data.data.name);
+      setShipTrackingNumber(response.data.data.ship_tracking_number);
+      setShipDate(response.data.data.ship_date);
       setPartner(response.data.data.customer_id);
       setDelivery(response.data.data.partner_shipping_id);
       setNotes(response.data.data.x_studio_notes);
@@ -414,6 +421,33 @@ export default function OrderDetailView({
           <Typography variant="body1"><b>Phone:</b> {delivery.phone}</Typography>
           <Typography variant="body1"><b>Mobile:</b> {delivery.mobile}</Typography>
           <Typography variant="body1"><b>Email:</b> {delivery.email}</Typography>
+        </>
+      )}
+      <div style={{ margin: '16px 0' }} />
+      {/* Display tracking number */}
+      {shipTrackingNumber && ( // Display error message if authError state is not null
+        <>
+          <div style={{ margin: '16px 0' }} />
+          <Typography variant="body1">
+            <strong>Tracking #: </strong>{shipTrackingNumber}
+            <IconButton
+              onClick={() => {
+                navigator.clipboard.writeText(shipTrackingNumber);
+                alert('Tracking number copied to clipboard!');
+              }}
+            >
+              <Icon icon={copyOutline} sx={{ color: 'text.disabled', width: 20, height: 20 }} />
+            </IconButton>
+          </Typography>
+        </>
+      )}
+      {/* Display ship date */}
+      {shipDate && ( // Display error message if authError state is not null
+        <>
+          <div style={{ margin: '16px 0' }} />
+          <Typography variant="body1">
+            <strong>Ship Date: </strong>{shipDate}
+          </Typography>
         </>
       )}
       <div style={{ margin: '16px 0' }} />

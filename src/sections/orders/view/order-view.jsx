@@ -158,7 +158,9 @@ export default function OrderView() {
                   { id: 'amount_total', label: 'Amount Total' },
                   { id: 'state', label: 'State' },
                   { id: 'x_studio_notes', label: 'Notes' },
-                  { id: 'client_order_ref', label: 'PO Number' }
+                  { id: 'client_order_ref', label: 'PO Number' },
+                  { id: 'ship_date', label: 'Ship Date' },
+                  { id: 'ship_tracking_number', label: 'Tracking #' }
                 ]}
               />
               <TableBody>
@@ -176,6 +178,8 @@ export default function OrderView() {
                       state={row.state}
                       x_studio_notes={row.x_studio_notes}
                       client_order_ref={row.client_order_ref}
+                      ship_date={row.ship_date}
+                      ship_tracking_number={row.ship_tracking_number}
                       handleClick={(event) => handleClick(event, row.id)}
                     />
                   ))}

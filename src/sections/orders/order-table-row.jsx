@@ -17,6 +17,8 @@ export default function OrderTableRow({
   state,
   x_studio_notes,
   client_order_ref,
+  ship_date,
+  ship_tracking_number,
   handleClick,
 }) {
 
@@ -37,6 +39,8 @@ export default function OrderTableRow({
       </TableCell>
       <TableCell>{x_studio_notes}</TableCell>
       <TableCell>{client_order_ref}</TableCell>
+      <TableCell>{ship_date}</TableCell>
+      <TableCell>{ship_tracking_number}</TableCell>
     </TableRow>
   );
 }
@@ -51,5 +55,7 @@ OrderTableRow.propTypes = {
   state: PropTypes.any,
   x_studio_notes: PropTypes.any,
   client_order_ref: PropTypes.any,
+  ship_date: PropTypes.any,
+  ship_tracking_number: PropTypes.any,
   handleClick: PropTypes.func,
 };
