@@ -126,7 +126,7 @@ export default function InvoiceView({ invoiceOrigin }) {
   const handleSendInvoice = (invoiceId) => {
     console.log('Sending Invoice')
     const action = 'post';
-    const requestUrl = `${config.baseURL}/api-proxy/proxy?method=${action}&resource=send-invoice`
+    const requestUrl = `${config.baseURL}/api-proxy/proxy?method=${action}&resource=send-invoices`
     console.log(requestUrl);
 
     const requestBody = {
