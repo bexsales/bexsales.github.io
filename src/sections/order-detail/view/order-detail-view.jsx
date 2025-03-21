@@ -29,6 +29,7 @@ import {
 
 import Iconify from 'src/components/iconify';
 
+import InvoicePopupModal from '../invoice-popup';
 import ProductPopupModal from '../edit-product-popup';
 import SendOrderPopupModal from '../send-order-popup';
 import CustomerPopupModal from '../edit-customer-popup';
@@ -561,6 +562,13 @@ export default function OrderDetailView({
             <SendOrderPopupModal 
               handleSendOrder={handleSendOrder}
               partner={partner}
+            />
+          </Stack>
+        )}
+        {(orderState === 'sale') && (
+          <Stack direction="row" spacing={2}>
+            <InvoicePopupModal 
+              invoiceOrigin={orderName}
             />
           </Stack>
         )}

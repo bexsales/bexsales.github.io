@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import config from 'src/config/config'; // Adjust the import path as necessary
 
 import axios from 'axios';
@@ -5,31 +7,28 @@ import Cookies from 'js-cookie'; // Import js-cookie for managing cookies
 import { useRef, useState, useEffect } from 'react';
 
 import Card from '@mui/material/Card';
-import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
-import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
-
-import { useRouter } from 'src/routes/hooks';
 
 import Scrollbar from 'src/components/scrollbar';
 
 import { emptyRows } from '../utils'
 import TableNoData from '../table-no-data';
-import OrderTableRow from '../order-table-row';
-import OrderTableHead from '../order-table-head';
 import TableEmptyRows from '../table-empty-rows';
-import OrderTableToolbar from '../order-table-toolbar';
+import InvoiceTableRow from '../invoice-table-row';
+import InvoiceTableHead from '../invoice-table-head';
+import InvoiceTableToolbar from '../invoice-table-toolbar';
 
 // ----------------------------------------------------------------------
 
-export default function OrderView() {
-  const router = useRouter();
+export default function InvoiceView({ invoiceOrigin }) {
 
-  const [saleOrders, setSaleOrders] = useState([]);
+  const _invoiceOrigin = invoiceOrigin;
+
+  const [invoices, setInvoices] = useState([]);
 
   const [page, setPage] = useState(0);
 
@@ -41,38 +40,35 @@ export default function OrderView() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [isPartnerSearch, setIsPartnerSearch] = useState(false);
-
   const [rowsPerPage, setRowsPerPage] = useState(25);
 
   const [totalCount, setTotalCount] = useState(0);
 
-  const saleOrdersRef = useRef(saleOrders);
+  const invoicesRef = useRef(invoices);
   const rowsPerPageRef = useRef(rowsPerPage);
   const pageRef = useRef(page);
   const filterNameRef = useRef(filterName);
 
   useEffect(() => {
     // Fetch orders from the API
-    saleOrdersRef.current = saleOrders;
+    invoicesRef.current = invoices;
     rowsPerPageRef.current = rowsPerPage;
     pageRef.current = page;
     filterNameRef.current = filterName;
-    fetchOrders(pageRef.current, rowsPerPageRef.current, saleOrdersRef.current, filterNameRef.current, isPartnerSearch);
+    fetchInvoices(pageRef.current, rowsPerPageRef.current, invoicesRef.current, filterNameRef.current, _invoiceOrigin);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchOrders = (pg, lm, ord, nm, isPartner) => {
-    console.log('Fetching Orders')
+  const fetchInvoices = (pg, lm, inv, nm, org) => {
+    console.log('Fetching Invoices')
     const normalizedPageNumber = pg + 1;
-    let requestUrl = `${config.baseURL}/api-proxy/proxy?method=get&resource=orders&page=${normalizedPageNumber}&page_size=${lm}`
+    let requestUrl = `${config.baseURL}/api-proxy/proxy?method=get&resource=invoices&page=${normalizedPageNumber}&page_size=${lm}`
     if (nm) {
       requestUrl += `&name=${nm}`;
     }
-    if (isPartner) {
-      requestUrl += `&search_partner=${isPartner}`;
+    if (org) {
+      requestUrl += `&invoice_origin=${org}`;
     }
-
     console.log(requestUrl);
     axios.get(requestUrl, {
       headers: {
@@ -81,11 +77,11 @@ export default function OrderView() {
     })
     .then(response => {
       console.log(response.data.data);
-      setSaleOrders([...ord,...response.data.data]);
+      setInvoices([...inv,...response.data.data]);
       setTotalCount(response.data.count);
     })
     .catch(error => {
-      console.error('Error fetching orders:', error);
+      console.error('Error fetching invoices:', error);
     });
   };
 
@@ -102,7 +98,7 @@ export default function OrderView() {
     const numberOfRecords = rowsPerPage * newPage;
     if (numberOfRecords > maxRecord) {
       setMaxRecord(numberOfRecords);
-      fetchOrders(newPage, rowsPerPage, saleOrders, filterName, isPartnerSearch)
+      fetchInvoices(newPage, rowsPerPage, invoices, filterName, _invoiceOrigin);
     }
 
   };
@@ -124,77 +120,100 @@ export default function OrderView() {
 
   const handleClickSearch = (event) => {
     setPage(0);
-    fetchOrders(page, rowsPerPage, [], filterName, isPartnerSearch);
+    fetchInvoices(page, rowsPerPage, [], filterName)
   };
 
-  const handleClick = (event, id) => {
-    router.push(`/orders/${id}`);
+  const handleSendInvoice = (invoiceId) => {
+    console.log('Sending Invoice')
+    const action = 'post';
+    const requestUrl = `${config.baseURL}/api-proxy/proxy?method=${action}&resource=send-invoices`
+    console.log(requestUrl);
+
+    const requestBody = {
+      invoice: {
+        id: parseInt(invoiceId, 10)
+      }
+    };
+    console.log('Request body', requestBody);
+
+    axios.post(requestUrl, requestBody, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get('jwt')}`, // Replace with your actual JWT token
+      }
+    })
+    .then(response => {
+      console.log(response.data);
+      if ( response.data.result.success === false ) {
+        alert(response.data.result.message);
+      } else {
+        alert('Invoice Sent!');
+      }
+    })
+    .catch(error => {
+      console.error('Error sending invoice:', error);
+    });
   };
 
-  const notFound = !saleOrders.length && !!filterName;
+  const notFound = !invoices.length && !!filterName;
 
   return (
     <Container>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Orders</Typography>
-      </Stack>
-
       <Card>
-        <OrderTableToolbar
+        <InvoiceTableToolbar
           filterName={filterName}
           onFilterName={handleFilterByName}
           onClickSearch={handleClickSearch}
           onHitEnter={handleEnter}
-          isPartnerSearch={isPartnerSearch}
-          onTogglePartnerSearch={() => setIsPartnerSearch(!isPartnerSearch)}
         />
 
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
-              <OrderTableHead
+              <InvoiceTableHead
                 order={order}
                 orderBy={orderBy}
-                rowCount={saleOrders.length}
+                rowCount={invoices.length}
                 onRequestSort={handleSort}
                 headLabel={[
+                  { id: 'email_action', label: ''},
                   { id: 'name', label: 'Name' },
+                  { id: 'payment_state', label: 'Payment State' },
                   { id: 'customer', label: 'Customer' },
+                  { id: 'customer_email', label: 'Email' },
                   { id: 'create_date', label: 'Create Date' },
                   { id: 'amount_untaxed', label: 'Amount Untaxed' },
                   { id: 'amount_tax', label: 'Amount Tax' },
                   { id: 'amount_total', label: 'Amount Total' },
                   { id: 'state', label: 'State' },
-                  { id: 'x_studio_notes', label: 'Notes' },
-                  { id: 'client_order_ref', label: 'PO Number' },
-                  { id: 'ship_date', label: 'Ship Date' },
-                  { id: 'ship_tracking_number', label: 'Tracking #' }
+                  { id: 'invoice_origin', label: 'Order' },
+                  { id: 'invoice_Date', label: 'Invoice Date' }
                 ]}
               />
               <TableBody>
-                {saleOrders
+                {invoices
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
-                    <OrderTableRow
+                    <InvoiceTableRow
                       key={row.id}
+                      id={row.id}
                       name={row.name}
+                      payment_state={row.payment_state}
                       customer={row.customer_id.name}
+                      customer_email={row.customer_id.email}
                       create_date={row.create_date}
                       amount_untaxed={row.amount_untaxed}
                       amount_tax={row.amount_tax}
                       amount_total={row.amount_total}
                       state={row.state}
-                      x_studio_notes={row.x_studio_notes}
-                      client_order_ref={row.client_order_ref}
-                      ship_date={row.ship_date}
-                      ship_tracking_number={row.ship_tracking_number}
-                      handleClick={(event) => handleClick(event, row.id)}
+                      invoice_origin={row.invoice_origin}
+                      invoice_date={row.invoice_date}
+                      handleSendInvoice={(event) => handleSendInvoice(event, row.id)}
                     />
                   ))}
 
                 <TableEmptyRows
                   height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, saleOrders.length)}
+                  emptyRows={emptyRows(page, rowsPerPage, invoices.length)}
                 />
 
                 {notFound && <TableNoData query={filterName} />}
@@ -216,3 +235,7 @@ export default function OrderView() {
     </Container>
   );
 }
+
+InvoiceView.propTypes = {
+  invoiceOrigin: PropTypes.string,
+};
