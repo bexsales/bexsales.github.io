@@ -31,6 +31,13 @@ export default function SendInvoicePopupModal({
     setOpen(false);
   };
 
+  const handleConfirm = async () => {
+    const result = await handleSendInvoice(invoiceId);
+    if (result === true) {
+      handleClose();
+    }
+  };
+
   return (
     <Stack direction="row" alignItems="center">
         <Stack direction="column" alignItems="center" spacing={1}>
@@ -60,7 +67,7 @@ export default function SendInvoicePopupModal({
                 <Button onClick={handleClose} color="primary">
                     Cancel
                 </Button>
-                <Button onClick={() => handleSendInvoice(invoiceId)} color="primary" autoFocus>
+                <Button onClick={handleConfirm} color="primary" autoFocus>
                     Confirm
                 </Button>
             </DialogActions>

@@ -123,35 +123,39 @@ export default function InvoiceView({ invoiceOrigin }) {
     fetchInvoices(page, rowsPerPage, [], filterName)
   };
 
-  const handleSendInvoice = (invoiceId) => {
-    console.log('Sending Invoice')
-    const action = 'post';
-    const requestUrl = `${config.baseURL}/api-proxy/proxy?method=${action}&resource=send-invoices`
-    console.log(requestUrl);
-
-    const requestBody = {
-      invoice: {
-        id: parseInt(invoiceId, 10)
-      }
-    };
-    console.log('Request body', requestBody);
-
-    axios.post(requestUrl, requestBody, {
-      headers: {
-        Authorization: `Bearer ${Cookies.get('jwt')}`, // Replace with your actual JWT token
-      }
-    })
-    .then(response => {
+  const handleSendInvoice = async (invoiceId) => {
+    try {
+      console.log('Sending Invoice');
+      const action = 'post';
+      const requestUrl = `${config.baseURL}/api-proxy/proxy?method=${action}&resource=send-invoices`;
+      console.log(requestUrl);
+  
+      const requestBody = {
+        invoice: {
+          id: parseInt(invoiceId, 10),
+        },
+      };
+      console.log('Request body', requestBody);
+  
+      const response = await axios.post(requestUrl, requestBody, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get('jwt')}`, // Replace with your actual JWT token
+        },
+      });
+  
       console.log(response.data);
-      if ( response.data.result.success === false ) {
-        alert(response.data.result.message);
-      } else {
-        alert('Invoice Sent!');
+  
+      if (response.data.success === false) {
+        alert('Invoice failed to send!');
+        return false;
       }
-    })
-    .catch(error => {
+      alert('Invoice Sent!');
+      return true;
+    } catch (error) {
       console.error('Error sending invoice:', error);
-    });
+      alert('Error sending invoice!');
+      return false;
+    }
   };
 
   const notFound = !invoices.length && !!filterName;
