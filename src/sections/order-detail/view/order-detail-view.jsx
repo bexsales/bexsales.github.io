@@ -277,7 +277,7 @@ export default function OrderDetailView({
             id: line.product_id.id,
             name: line.name,
             product_uom_qty: line.product_uom_qty,
-            attributes: line.product_id.attributes.map((i) => `${i.attribute}:${i.name}`),
+            attributes: line.product_id.attributes,
             qty_available: line.product_id.qty_available,
             type: line.product_id.type
           }
@@ -475,7 +475,7 @@ export default function OrderDetailView({
                 <TableCell>{item[2].name}</TableCell>
                 <TableCell>
                   {item[2].attributes.map((attribute, ind) => (
-                    <Chip key={ind} label={attribute} variant="outlined" />
+                    <Chip key={ind} label={attribute.name || attribute.attribute} variant="outlined" />
                   ))}
                 </TableCell>
                 <TableCell>{formatToDollars(productUnitPrices[item[2].id])}</TableCell>

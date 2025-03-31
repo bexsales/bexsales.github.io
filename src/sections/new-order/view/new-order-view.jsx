@@ -465,7 +465,7 @@ export default function NewOrderView() {
                 <TableCell>[{item.default_code}] {item.name}</TableCell>
                 <TableCell>
                   {item.attributes.map((attribute, ind) => (
-                    <Chip key={ind} label={attribute} variant="outlined" />
+                    <Chip key={ind} label={attribute.name || attribute.attribute} variant="outlined" />
                   ))}
                 </TableCell>
                 <TableCell>{formatToDollars(productUnitPrices[item.id])}</TableCell>

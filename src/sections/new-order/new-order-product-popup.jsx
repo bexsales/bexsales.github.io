@@ -10,7 +10,7 @@ import {
     DialogActions
 } from '@mui/material';
 
-import { ProductView } from '../products/view';
+import { ProductTemplateView } from '../product-templates/view';
 
 export default function ProductPopupModal({ onSelect }) {
   const [open, setOpen] = useState(false);
@@ -37,7 +37,7 @@ export default function ProductPopupModal({ onSelect }) {
         <DialogTitle>Products</DialogTitle>
         <DialogContent>
             <FormControl sx={{ width: '100%' }}>
-                <ProductView onSelect={onSelectFromModal} style={{ width: '100%' }}/>
+                <ProductTemplateView onSelect={onSelectFromModal} style={{ width: '100%' }}/>
             </FormControl>
         </DialogContent>
         <DialogActions>
