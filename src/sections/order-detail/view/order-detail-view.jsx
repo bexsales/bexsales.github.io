@@ -342,22 +342,31 @@ export default function OrderDetailView({
     })
   }; 
 
-  const handleSelectedProduct = (product) => {
-    console.log('Adding order line')
-    console.log(product)
-    const blacklist = ['consu', 'service']
-    if ( (product.qty_available < 1) && (!blacklist.includes(product.type)) ) {
-      alert('Cannot add product lines with 0 qty available');
-    } else {
-      setOrderLine([...orderLine,[0, 0, {
-        id: product.id,
-        name: `[${product.default_code}] ${product.name}`,
-        product_uom_qty: 1,
-        attributes: product.attributes,
-        qty_available: product.qty_available
-      }]]);
-    }
-  }; 
+  const handleSelectedProducts = (products) => {
+    console.log('Adding order lines');
+    console.log(products);
+  
+    products.forEach((product) => {
+      setOrderLine(prevOrderLine => [
+        ...prevOrderLine,
+        [0, 0, {
+            id: product.id,
+            name: `[${product.default_code}] ${product.name}`,
+            product_uom_qty: product.qty_needed || 1,
+            attributes: product.attributes,
+            qty_available: product.qty_available
+          }]
+        ]);
+    });
+  };
+
+  // setOrderLine([...orderLine,[0, 0, {
+  //   id: product.id,
+  //   name: `[${product.default_code}] ${product.name}`,
+  //   product_uom_qty: product.qty_needed || 1,
+  //   attributes: product.attributes,
+  //   qty_available: product.qty_available
+  // }]]);
   
   const renderForm = (
     <>
@@ -453,7 +462,7 @@ export default function OrderDetailView({
       )}
       <div style={{ margin: '16px 0' }} />
       <IconButton>
-        <ProductPopupModal onSelect={handleSelectedProduct}/>
+        <ProductPopupModal onSelect={handleSelectedProducts}/>
       </IconButton>
       <div style={{ margin: '16px 0' }} />
       <TableContainer component={Paper}>

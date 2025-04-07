@@ -147,9 +147,7 @@ export default function NewOrderView() {
       if (productArr.length === csvArray.length) {
         console.log('Setting products');
         console.log(productArr);
-        productArr.forEach(prod => {
-          handleSelectedProduct(prod, prod.product_uom_qty);
-        });
+        handleSelectedProducts(productArr);
       }
       e.target.value = null; 
     };
@@ -276,23 +274,25 @@ export default function NewOrderView() {
   }; 
 
   // add new parameter for checking the quantity because it may come from CSV
-  const handleSelectedProduct = (product, qty) => {
-    console.log('Adding order line')
-    console.log(product)
-    let is_duplicate = false;
-    orderLine.forEach(item => {
-      if (item.id === product.id) {
-        is_duplicate = true;
+  const handleSelectedProducts = (products) => {
+    console.log('Adding order lines');
+    console.log(products);
+  
+    const blacklist = ['consu', 'service'];
+  
+    products.forEach((product) => {
+      const is_duplicate = orderLine.some(item => item.id === product.id);
+  
+      if ((product.qty_available < 1) && !blacklist.includes(product.type)) {
+        alert(`Cannot add product lines with 0 qty available: SKU ${product.default_code}`);
+        return;
       }
-    });
-    const blacklist = ['consu', 'service']
-    if ( (product.qty_available < 1) && ((!blacklist.includes(product.type)))) {
-      alert(`Cannot add product lines with 0 qty available: SKU ${product.default_code}`);
-    } 
-    else if ( is_duplicate ) {
-      alert(`Product has already been added: SKU ${product.default_code}`);
-    }
-    else {
+  
+      if (is_duplicate) {
+        alert(`Product has already been added: SKU ${product.default_code}`);
+        return;
+      }
+  
       setOrderLine(prevOrderLine => [
         ...prevOrderLine,
         {
@@ -308,12 +308,12 @@ export default function NewOrderView() {
           sale_ok: product.sale_ok,
           purchase_ok: product.purchase_ok,
           sales_count: product.sales_count,
-          product_uom_qty: qty || 1,
-          qty_available: product.qty_available
+          product_uom_qty: product.qty_needed || 1,
+          qty_available: product.qty_available,
         }
       ]);
-    }
-  };
+    });
+  };  
 
   const handleChangeNotes = (event) => {
     setNotes(event.target.value);
@@ -428,7 +428,7 @@ export default function NewOrderView() {
 
       <div style={{ margin: '16px 0' }} />
       <IconButton>
-        <ProductPopupModal onSelect={handleSelectedProduct}/>
+        <ProductPopupModal onSelect={handleSelectedProducts}/>
       </IconButton>
       <input
         type="file"

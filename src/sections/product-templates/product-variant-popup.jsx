@@ -6,13 +6,21 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
     Box,
     Chip,
+    Paper,
     Stack,
+    Table,
     Button,
     Dialog,
+    TableRow,
+    TableBody,
+    TableCell,
+    TableHead,
+    TextField,
     Typography,
     DialogTitle,
     DialogContent,
-    DialogActions
+    DialogActions,
+    TableContainer
   } from '@mui/material';
 
 import config from 'src/config/config';
@@ -26,6 +34,7 @@ export default function ProductVariantPopupModal({
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedAttributes, setSelectedAttributes] = useState({});
   const [variantInfo, setVariantInfo] = useState('...');
+  const [selectedProducts, setSelectedProducts] = useState([]);
 
   const allSelected = product?.attributes?.every(
     (attr) => selectedAttributes[attr.attribute]
@@ -103,19 +112,52 @@ export default function ProductVariantPopupModal({
   };
 
   const addToOrder = () => {
-    if ( !selectedVariant ) {
-        alert('You must have a variant selected! Please select one value for each variant. If you already selected for all attributes, the product is not available.')
+    if (!Array.isArray(selectedProducts) || selectedProducts.length === 0) {
+      alert('You must select at least one product variant before adding to order.');
+      return;
     }
-    else {
-        // Rename 'product_template_attribute_value_ids' to 'attributes'
-        const updatedProduct = {
-            ...selectedVariant, // Spread the existing properties
-            attributes: selectedVariant.product_template_attribute_value_ids, // Rename the field
-            product_template_attribute_value_ids: undefined, // Remove the old field
-        };
-        console.log(updatedProduct);
-        onSelect(updatedProduct);
+  
+    // Clean up each product before passing
+    const cleanedProducts = selectedProducts.map(_product => ({
+      ..._product,
+      attributes: _product.product_template_attribute_value_ids,
+      product_template_attribute_value_ids: undefined,
+    }));
+  
+    console.log('Final cleaned products to add:', cleanedProducts);
+  
+    onSelect(cleanedProducts); // send the array
+  };
+
+  const handleQtyChange = (id, value) => {
+    const parsed = parseInt(value, 10);
+    setSelectedProducts((prev) =>
+      prev.map((p) =>
+        p.id === id ? { ...p, qty_needed: Number.isNaN(parsed) ? '' : parsed } : p
+      )
+    );
+  };
+
+  const addThis = () => {
+    if (!selectedVariant) {
+      alert('You must have a variant selected! Please select one value for each variant.');
+      return;
     }
+
+    const newProduct = {
+      ...selectedVariant,
+      qty_needed: 1,
+    };
+
+    setSelectedProducts((prev) => {
+      const existing = prev.find((p) => p.id === newProduct.id);
+      if (existing) {
+        return prev.map((p) =>
+          p.id === newProduct.id ? { ...p, qty_needed: p.qty_needed + 1 } : p
+        );
+      }
+      return [...prev, newProduct];
+    });
   };
 
   return (
@@ -174,16 +216,54 @@ export default function ProductVariantPopupModal({
         ))}
         {/* Display variant info if selected */}
         {variantInfo && (
-          <Box
-            sx={{
-              mt: 2,
-              p: 2,
-              border: '1px solid #ccc',
-              borderRadius: 1,
-              backgroundColor: '#f5f5f5',
-            }}
-          >
+          <Box sx={{ mt: 2, p: 2, border: '1px solid #ccc', borderRadius: 1, backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Typography variant="subtitle1">{variantInfo}</Typography>
+            <Button variant="contained" color="primary" onClick={addThis} disabled={!allSelected}>
+              Add
+            </Button>
+          </Box>
+        )}
+
+        {selectedProducts.length > 0 && (
+          <Box sx={{ mt: 3 }}>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Product</TableCell>
+                    <TableCell>Attributes</TableCell>
+                    <TableCell>Qty Available</TableCell>
+                    <TableCell>Qty Needed</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {selectedProducts.map((_product) => (
+                    <TableRow key={_product.id}>
+                      <TableCell>{_product.default_code ? `[${_product.default_code}] ` : ''}{_product.name}</TableCell>
+                      <TableCell>{_product.product_template_attribute_value_ids?.map((attr) => (
+                          <Chip key={attr.id} label={attr.name} size="small" />
+                        ))}</TableCell>
+                      <TableCell>{_product.qty_available}</TableCell>
+                      <TableCell>
+                        <TextField
+                          type="number"
+                          size="small"
+                          value={_product.qty_needed}
+                          onChange={(e) => handleQtyChange(_product.id, e.target.value)}
+                          onBlur={(e) => {
+                            const parsed = parseInt(e.target.value, 10);
+                            if (!parsed || parsed < 1) {
+                              handleQtyChange(_product.id, 1);
+                            }
+                          }}
+                          inputProps={{ min: 1 }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Box>
         )}
       </DialogContent>
