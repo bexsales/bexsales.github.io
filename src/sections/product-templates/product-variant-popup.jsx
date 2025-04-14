@@ -3,6 +3,7 @@ import Cookies from 'js-cookie'; // Import js-cookie for managing cookies
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, useCallback } from 'react';
 
+import IconButton from '@mui/material/IconButton';
 import {
     Box,
     Chip,
@@ -25,6 +26,8 @@ import {
 
 import config from 'src/config/config';
 
+import Iconify from 'src/components/iconify';
+
 export default function ProductVariantPopupModal({
   open,
   onClose,
@@ -35,6 +38,10 @@ export default function ProductVariantPopupModal({
   const [selectedAttributes, setSelectedAttributes] = useState({});
   const [variantInfo, setVariantInfo] = useState('...');
   const [selectedProducts, setSelectedProducts] = useState([]);
+
+  const handleDeleteProduct = (id) => {
+    setSelectedProducts((prev) => prev.filter((p) => p.id !== id));
+  };
 
   const allSelected = product?.attributes?.every(
     (attr) => selectedAttributes[attr.attribute]
@@ -234,6 +241,7 @@ export default function ProductVariantPopupModal({
                     <TableCell>Attributes</TableCell>
                     <TableCell>Qty Available</TableCell>
                     <TableCell>Qty Needed</TableCell>
+                    <TableCell/> {/* For Delete button */}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -258,6 +266,11 @@ export default function ProductVariantPopupModal({
                           }}
                           inputProps={{ min: 1 }}
                         />
+                      </TableCell>
+                      <TableCell>
+                        <IconButton onClick={() => handleDeleteProduct(_product.id)}>
+                          <Iconify icon="eva:trash-2-outline" />
+                        </IconButton>
                       </TableCell>
                     </TableRow>
                   ))}
