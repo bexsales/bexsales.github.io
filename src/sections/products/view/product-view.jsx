@@ -172,7 +172,7 @@ export default function ProductView({
                       type={row.type}
                       lst_price={row.lst_price}
                       description_sale={row.description_sale}
-                      attributes={row.product_template_attribute_value_ids.map((i) => `${i.attribute}:${i.name}`)}
+                      attributes={row.product_template_attribute_value_ids}
                       virtual_available={row.virtual_available}
                       qty_available={row.qty_available}
                       onSelect={onSelect}

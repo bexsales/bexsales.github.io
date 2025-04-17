@@ -19,7 +19,6 @@ export default function ProductTableRow({
   qty_available,
   onSelect
 }) {
-
   // Format amount to dollars
   const formatToDollars = (amount) => `$${amount.toFixed(2)}`;
 
@@ -45,7 +44,7 @@ export default function ProductTableRow({
       <TableCell>{description_sale}</TableCell>
       <TableCell>
         {attributes.map((attribute, index) => (
-          <Chip key={index} label={attribute} variant="outlined" />
+          <Chip key={index} label={attribute.name} variant="outlined" />
         ))}
       </TableCell>
       <TableCell>{qty_available}</TableCell>

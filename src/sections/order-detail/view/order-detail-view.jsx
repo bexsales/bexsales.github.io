@@ -35,6 +35,7 @@ import SendOrderPopupModal from '../send-order-popup';
 import CustomerPopupModal from '../edit-customer-popup';
 import DeliveryPopupModal from '../edit-delivery-popup';
 import CancelOrderPopupModal from '../cancel-order-popup';
+import ProductSKUPopupModal from '../edit-product-sku-popup';
 
 // ----------------------------------------------------------------------
 
@@ -463,6 +464,9 @@ export default function OrderDetailView({
       <div style={{ margin: '16px 0' }} />
       <IconButton>
         <ProductPopupModal onSelect={handleSelectedProducts}/>
+      </IconButton>
+      <IconButton>
+        <ProductSKUPopupModal onSelect={handleSelectedProducts}/>
       </IconButton>
       <div style={{ margin: '16px 0' }} />
       <TableContainer component={Paper}>

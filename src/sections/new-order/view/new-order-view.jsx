@@ -33,6 +33,7 @@ import Iconify from 'src/components/iconify';
 import ProductPopupModal from '../new-order-product-popup';
 import CustomerPopupModal from '../new-order-customer-popup';
 import DeliveryPopupModal from '../new-order-delivery-popup';
+import ProductSKUPopupModal from '../new-order-product-sku-popup';
 
 // ----------------------------------------------------------------------
 
@@ -429,6 +430,9 @@ export default function NewOrderView() {
       <div style={{ margin: '16px 0' }} />
       <IconButton>
         <ProductPopupModal onSelect={handleSelectedProducts}/>
+      </IconButton>
+      <IconButton>
+        <ProductSKUPopupModal onSelect={handleSelectedProducts}/>
       </IconButton>
       <input
         type="file"
