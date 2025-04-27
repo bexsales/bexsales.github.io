@@ -8,11 +8,14 @@ import { useRef, useState, useEffect } from 'react';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
+import TableRow from '@mui/material/TableRow';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import Scrollbar from 'src/components/scrollbar';
 
@@ -31,6 +34,9 @@ export default function CustomerView({
   filterTypeOption,
   filterParentContactOption
 }) {
+
+  const [loading, setLoading] = useState(false);
+
   const [customers, setCustomers] = useState([]);
 
   const [page, setPage] = useState(0);
@@ -73,7 +79,8 @@ export default function CustomerView({
   }, []);
 
   const fetchCustomers = (pg, lm, cst, nm, ft, pc) => {
-    console.log('Fetching Customers')
+    console.log('Fetching Customers');
+    setLoading(true);
     const normalizedPageNumber = pg + 1;
     let requestUrl = `${config.baseURL}/api-proxy/proxy?method=get&resource=customers&page=${normalizedPageNumber}&page_size=${lm}`
     if (nm) {
@@ -98,6 +105,9 @@ export default function CustomerView({
     })
     .catch(error => {
       console.error('Error fetching customers:', error);
+    })
+    .finally(() => {
+      setLoading(false);
     });
   };
 
@@ -179,31 +189,41 @@ export default function CustomerView({
                 ]}
               />
               <TableBody>
-                {customers
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <UserTableRow
-                      key={row.id}
-                      id={row.id}
-                      name={row.name}
-                      street={row.street}
-                      city={row.city}
-                      state={row.state_id.name}
-                      country={row.country_id.name}
-                      zip={row.zip}
-                      phone={row.phone}
-                      mobile={row.mobile}
-                      email={row.email}
-                      onSelect={onSelect}
-                    />
-                  ))}
+                {loading ? (
+                      <TableRow>
+                        <TableCell colSpan={12} align="center">
+                          <CircularProgress />
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      <>
+                        {customers
+                          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                          .map((row) => (
+                            <UserTableRow
+                              key={row.id}
+                              id={row.id}
+                              name={row.name}
+                              street={row.street}
+                              city={row.city}
+                              state={row.state_id.name}
+                              country={row.country_id.name}
+                              zip={row.zip}
+                              phone={row.phone}
+                              mobile={row.mobile}
+                              email={row.email}
+                              onSelect={onSelect}
+                            />
+                          ))}
 
-                <TableEmptyRows
-                  height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, customers.length)}
-                />
+                        <TableEmptyRows
+                          height={77}
+                          emptyRows={emptyRows(page, rowsPerPage, customers.length)}
+                        />
 
-                {notFound && <TableNoData query={filterName} />}
+                        {notFound && <TableNoData query={filterName} />}
+                </>
+                )}
               </TableBody>
             </Table>
           </TableContainer>

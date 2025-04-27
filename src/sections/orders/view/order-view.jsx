@@ -7,11 +7,14 @@ import { useRef, useState, useEffect } from 'react';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
+import TableRow from '@mui/material/TableRow';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { useRouter } from 'src/routes/hooks';
 
@@ -28,6 +31,8 @@ import OrderTableToolbar from '../order-table-toolbar';
 
 export default function OrderView() {
   const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
 
   const [saleOrders, setSaleOrders] = useState([]);
 
@@ -63,7 +68,8 @@ export default function OrderView() {
   }, []);
 
   const fetchOrders = (pg, lm, ord, nm, isPartner) => {
-    console.log('Fetching Orders')
+    console.log('Fetching Orders');
+    setLoading(true);
     const normalizedPageNumber = pg + 1;
     let requestUrl = `${config.baseURL}/api-proxy/proxy?method=get&resource=orders&page=${normalizedPageNumber}&page_size=${lm}`
     if (nm) {
@@ -86,6 +92,9 @@ export default function OrderView() {
     })
     .catch(error => {
       console.error('Error fetching orders:', error);
+    })
+    .finally(() => {
+      setLoading(false);
     });
   };
 
@@ -165,6 +174,7 @@ export default function OrderView() {
                   { id: 'amount_tax', label: 'Amount Tax' },
                   { id: 'amount_total', label: 'Amount Total' },
                   { id: 'state', label: 'State' },
+                  { id: 'invoiced', label: 'Invoiced' },
                   { id: 'x_studio_notes', label: 'Notes' },
                   { id: 'client_order_ref', label: 'PO Number' },
                   { id: 'ship_date', label: 'Ship Date' },
@@ -172,33 +182,45 @@ export default function OrderView() {
                 ]}
               />
               <TableBody>
-                {saleOrders
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <OrderTableRow
-                      key={row.id}
-                      name={row.name}
-                      customer={row.customer_id.name}
-                      create_date={row.create_date}
-                      amount_untaxed={row.amount_untaxed}
-                      amount_tax={row.amount_tax}
-                      amount_total={row.amount_total}
-                      state={row.state}
-                      x_studio_notes={row.x_studio_notes}
-                      client_order_ref={row.client_order_ref}
-                      ship_date={row.ship_date}
-                      ship_tracking_number={row.ship_tracking_number}
-                      handleClick={(event) => handleClick(event, row.id)}
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={12} align="center">
+                      <CircularProgress />
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  <>
+                    {saleOrders
+                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                      .map((row) => (
+                        <OrderTableRow
+                          key={row.id}
+                          name={row.name}
+                          customer={row.customer_id.name}
+                          create_date={row.create_date}
+                          amount_untaxed={row.amount_untaxed}
+                          amount_tax={row.amount_tax}
+                          amount_total={row.amount_total}
+                          state={row.state}
+                          invoiced={row.account_move_count > 0}
+                          x_studio_notes={row.x_studio_notes}
+                          client_order_ref={row.client_order_ref}
+                          ship_date={row.ship_date}
+                          ship_tracking_number={row.ship_tracking_number}
+                          handleClick={(event) => handleClick(event, row.id)}
+                        />
+                      ))}
+
+                    <TableEmptyRows
+                      height={77}
+                      emptyRows={emptyRows(page, rowsPerPage, saleOrders.length)}
                     />
-                  ))}
 
-                <TableEmptyRows
-                  height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, saleOrders.length)}
-                />
-
-                {notFound && <TableNoData query={filterName} />}
+                    {notFound && <TableNoData query={filterName} />}
+                  </>
+                )}
               </TableBody>
+
             </Table>
           </TableContainer>
         </Scrollbar>

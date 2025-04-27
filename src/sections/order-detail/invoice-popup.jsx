@@ -12,7 +12,7 @@ import {
 
 import { InvoiceView } from '../invoices/view';
 
-export default function InvoicePopupModal({ invoiceOrigin }) {
+export default function InvoicePopupModal({ invoiceOrigin, accountMoveCount }) {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => {
@@ -26,7 +26,7 @@ export default function InvoicePopupModal({ invoiceOrigin }) {
   return (
     <div>
       <Button variant="outlined" onClick={handleOpen}>
-        Invoices
+        Invoices ({ accountMoveCount })
       </Button>
       <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth>
         <DialogTitle>Invoices</DialogTitle>
@@ -47,4 +47,5 @@ export default function InvoicePopupModal({ invoiceOrigin }) {
 
 InvoicePopupModal.propTypes = {
     invoiceOrigin: PropTypes.func,
+    accountMoveCount: PropTypes.number
 };

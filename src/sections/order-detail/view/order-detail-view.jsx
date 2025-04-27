@@ -90,6 +90,8 @@ export default function OrderDetailView({
   const [shipTrackingNumber, setShipTrackingNumber] = useState('');
   const [shipDate, setShipDate] = useState('');
 
+  const [accountMoveCount, setAccountMoveCount] = useState(0);
+
   useEffect(() => {
     // Fetch order details from the API
     fetchOrder();
@@ -289,6 +291,7 @@ export default function OrderDetailView({
       setSubTotal(response.data.data.amount_untaxed);
       setTotal(response.data.data.amount_total);
       setOrderState(response.data.data.state);
+      setAccountMoveCount(response.data.data.account_move_count);
     })
     .catch(error => {
       console.error('Error fetching order details:', error);
@@ -578,10 +581,11 @@ export default function OrderDetailView({
             />
           </Stack>
         )}
-        {(orderState === 'sale') && (
+        {orderState === 'sale' && accountMoveCount > 0 && (
           <Stack direction="row" spacing={2}>
             <InvoicePopupModal 
               invoiceOrigin={orderName}
+              accountMoveCount={accountMoveCount}
             />
           </Stack>
         )}

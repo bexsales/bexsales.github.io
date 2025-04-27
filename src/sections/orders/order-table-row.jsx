@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 
+import Checkbox from '@mui/material/Checkbox';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 
@@ -15,6 +16,7 @@ export default function OrderTableRow({
   amount_tax,
   amount_total,
   state,
+  invoiced,
   x_studio_notes,
   client_order_ref,
   ship_date,
@@ -37,6 +39,9 @@ export default function OrderTableRow({
       <TableCell>
           <Label color={(state !== 'draft' && 'error') || 'success'}>{state}</Label>
       </TableCell>
+      <TableCell align="center">
+        <Checkbox checked={invoiced} disabled />
+      </TableCell>
       <TableCell>{x_studio_notes}</TableCell>
       <TableCell>{client_order_ref}</TableCell>
       <TableCell>{ship_date}</TableCell>
@@ -53,6 +58,7 @@ OrderTableRow.propTypes = {
   amount_tax: PropTypes.any,
   amount_total: PropTypes.any,
   state: PropTypes.any,
+  invoiced: PropTypes.bool,
   x_studio_notes: PropTypes.any,
   client_order_ref: PropTypes.any,
   ship_date: PropTypes.any,

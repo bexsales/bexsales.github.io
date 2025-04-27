@@ -8,11 +8,14 @@ import { useRef, useState, useEffect } from 'react';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
+import TableRow from '@mui/material/TableRow';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import Scrollbar from 'src/components/scrollbar';
 
@@ -29,6 +32,8 @@ export default function ProductView({
   showTitle,
   onSelect,
 }) {
+
+  const [loading, setLoading] = useState(false);
 
   const [products, setProducts] = useState([]);
 
@@ -62,7 +67,8 @@ export default function ProductView({
   }, []);
 
   const fetchProducts = (pg, lm, prod, nm) => {
-    console.log('Fetching Products')
+    console.log('Fetching Products');
+    setLoading(true);
     const normalizedPageNumber = pg + 1;
     let requestUrl = `${config.baseURL}/api-proxy/proxy?method=get&resource=products&page=${normalizedPageNumber}&page_size=${lm}`
     if (nm) {
@@ -81,6 +87,9 @@ export default function ProductView({
     })
     .catch(error => {
       console.error('Error fetching products:', error);
+    })    
+    .finally(() => {
+      setLoading(false);
     });
   };
 
@@ -160,31 +169,41 @@ export default function ProductView({
                 ]}
               />
               <TableBody>
-                {products
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <ProductTableRow
-                      key={row.id}
-                      id={row.id}
-                      default_code={row.default_code}
-                      name={row.name}
-                      category={row.categ_id.name}
-                      type={row.type}
-                      lst_price={row.lst_price}
-                      description_sale={row.description_sale}
-                      attributes={row.product_template_attribute_value_ids}
-                      virtual_available={row.virtual_available}
-                      qty_available={row.qty_available}
-                      onSelect={onSelect}
-                    />
-                  ))}
+                {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={12} align="center">
+                        <CircularProgress />
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    <>
+                      {products
+                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        .map((row) => (
+                          <ProductTableRow
+                            key={row.id}
+                            id={row.id}
+                            default_code={row.default_code}
+                            name={row.name}
+                            category={row.categ_id.name}
+                            type={row.type}
+                            lst_price={row.lst_price}
+                            description_sale={row.description_sale}
+                            attributes={row.product_template_attribute_value_ids}
+                            virtual_available={row.virtual_available}
+                            qty_available={row.qty_available}
+                            onSelect={onSelect}
+                          />
+                        ))}
 
-                <TableEmptyRows
-                  height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, products.length)}
-                />
+                      <TableEmptyRows
+                        height={77}
+                        emptyRows={emptyRows(page, rowsPerPage, products.length)}
+                      />
 
-                {notFound && <TableNoData query={filterName} />}
+                      {notFound && <TableNoData query={filterName} />}
+                  </>
+                )}
               </TableBody>
             </Table>
           </TableContainer>

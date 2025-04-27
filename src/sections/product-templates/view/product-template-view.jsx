@@ -8,11 +8,14 @@ import { useRef, useState, useEffect } from 'react';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
+import TableRow from '@mui/material/TableRow';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import Scrollbar from 'src/components/scrollbar';
 
@@ -30,6 +33,8 @@ export default function ProductTemplateView({
   showTitle,
   onSelect,
 }) {
+
+  const [loading, setLoading] = useState(false);
 
   const [products, setProducts] = useState([]);
 
@@ -67,7 +72,8 @@ export default function ProductTemplateView({
   }, []);
 
   const fetchProducts = (pg, lm, prod, nm) => {
-    console.log('Fetching Products')
+    console.log('Fetching Products');
+    setLoading(true);
     const normalizedPageNumber = pg + 1;
     let requestUrl = `${config.baseURL}/api-proxy/proxy?method=get&resource=product-templates&page=${normalizedPageNumber}&page_size=${lm}`
     if (nm) {
@@ -86,6 +92,9 @@ export default function ProductTemplateView({
     })
     .catch(error => {
       console.error('Error fetching products:', error);
+    })
+    .finally(() => {
+      setLoading(false);
     });
   };
 
@@ -166,27 +175,37 @@ export default function ProductTemplateView({
                 ]}
               />
               <TableBody>
-                {products
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <ProductTemplateTableRow
-                      key={row.id}
-                      id={row.id}
-                      name={row.name}
-                      category={row.categ_id.name}
-                      type={row.type}
-                      list_price={row.list_price}
-                      attributes={row.attribute_line_ids}
-                      onSelect={handleRowSelect}
-                    />
-                  ))}
+                {loading ? (
+                      <TableRow>
+                        <TableCell colSpan={12} align="center">
+                          <CircularProgress />
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      <>
+                        {products
+                          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                          .map((row) => (
+                            <ProductTemplateTableRow
+                              key={row.id}
+                              id={row.id}
+                              name={row.name}
+                              category={row.categ_id.name}
+                              type={row.type}
+                              list_price={row.list_price}
+                              attributes={row.attribute_line_ids}
+                              onSelect={handleRowSelect}
+                            />
+                          ))}
 
-                <TableEmptyRows
-                  height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, products.length)}
-                />
+                        <TableEmptyRows
+                          height={77}
+                          emptyRows={emptyRows(page, rowsPerPage, products.length)}
+                        />
 
-                {notFound && <TableNoData query={filterName} />}
+                        {notFound && <TableNoData query={filterName} />}
+                      </>
+                  )}
               </TableBody>
             </Table>
           </TableContainer>
