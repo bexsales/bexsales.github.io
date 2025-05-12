@@ -8,10 +8,8 @@ import { useRef, useState, useEffect } from 'react';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
-import TableRow from '@mui/material/TableRow';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
@@ -123,6 +121,9 @@ export default function CustomerView({
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     const numberOfRecords = rowsPerPage * newPage;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     if (numberOfRecords > maxRecord) {
       setMaxRecord(numberOfRecords);
       fetchCustomers(newPage, rowsPerPage, customers, filterName, filterType, filterParentContact);
@@ -153,93 +154,103 @@ export default function CustomerView({
   const notFound = !customers.length && !!filterName;
 
   return (
-    <Container>
-      {showTitle && ( // Display error message if authError state is not null
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Typography variant="h4">Customers</Typography>
+    <>
+      {loading && (
+        <Stack
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            bgcolor: 'rgba(255, 255, 255, 0.6)',
+            zIndex: 2000, // high enough to overlay everything
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <CircularProgress />
         </Stack>
       )}
+      <Container>
+        {showTitle && ( // Display error message if authError state is not null
+          <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+            <Typography variant="h4">Customers</Typography>
+          </Stack>
+        )}
 
-      <Card>
-        <UserTableToolbar
-          filterName={filterName}
-          onFilterName={handleFilterByName}
-          onClickSearch={handleClickSearch}
-          onHitEnter={handleEnter}
-        />
+        <Card>
+          <UserTableToolbar
+            filterName={filterName}
+            onFilterName={handleFilterByName}
+            onClickSearch={handleClickSearch}
+            onHitEnter={handleEnter}
+          />
 
-        <Scrollbar>
-          <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }}>
-              <UserTableHead
-                order={order}
-                orderBy={orderBy}
-                rowCount={customers.length}
-                onRequestSort={handleSort}
-                headLabel={[
-                  { id: 'name', label: 'Name' },
-                  { id: 'street', label: 'Street' },
-                  { id: 'city', label: 'City' },
-                  { id: 'state', label: 'State' },
-                  { id: 'country', label: 'Country' },
-                  { id: 'zip', label: 'Zip' },
-                  { id: 'phone', label: 'Phone' },
-                  { id: 'mobile', label: 'Mobile' },
-                  { id: 'email', label: 'Email' },
-                ]}
-              />
-              <TableBody>
-                {loading ? (
-                      <TableRow>
-                        <TableCell colSpan={12} align="center">
-                          <CircularProgress />
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      <>
-                        {customers
-                          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                          .map((row) => (
-                            <UserTableRow
-                              key={row.id}
-                              id={row.id}
-                              name={row.name}
-                              street={row.street}
-                              city={row.city}
-                              state={row.state_id.name}
-                              country={row.country_id.name}
-                              zip={row.zip}
-                              phone={row.phone}
-                              mobile={row.mobile}
-                              email={row.email}
-                              onSelect={onSelect}
-                            />
-                          ))}
+          <Scrollbar>
+            <TableContainer sx={{ overflow: 'unset' }}>
+              <Table sx={{ minWidth: 800 }}>
+                <UserTableHead
+                  order={order}
+                  orderBy={orderBy}
+                  rowCount={customers.length}
+                  onRequestSort={handleSort}
+                  headLabel={[
+                    { id: 'name', label: 'Name' },
+                    { id: 'street', label: 'Street' },
+                    { id: 'city', label: 'City' },
+                    { id: 'state', label: 'State' },
+                    { id: 'country', label: 'Country' },
+                    { id: 'zip', label: 'Zip' },
+                    { id: 'phone', label: 'Phone' },
+                    { id: 'mobile', label: 'Mobile' },
+                    { id: 'email', label: 'Email' },
+                  ]}
+                />
+                <TableBody>
+                          {customers
+                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            .map((row) => (
+                              <UserTableRow
+                                key={row.id}
+                                id={row.id}
+                                name={row.name}
+                                street={row.street}
+                                city={row.city}
+                                state={row.state_id.name}
+                                country={row.country_id.name}
+                                zip={row.zip}
+                                phone={row.phone}
+                                mobile={row.mobile}
+                                email={row.email}
+                                onSelect={onSelect}
+                              />
+                            ))}
 
-                        <TableEmptyRows
-                          height={77}
-                          emptyRows={emptyRows(page, rowsPerPage, customers.length)}
-                        />
+                          <TableEmptyRows
+                            height={77}
+                            emptyRows={emptyRows(page, rowsPerPage, customers.length)}
+                          />
 
-                        {notFound && <TableNoData query={filterName} />}
-                </>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Scrollbar>
+                          {notFound && <TableNoData query={filterName} />}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Scrollbar>
 
-        <TablePagination
-          page={page}
-          component="div"
-          count={totalCount}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[25]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Card>
-    </Container>
+          <TablePagination
+            page={page}
+            component="div"
+            count={totalCount}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            rowsPerPageOptions={[25]}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Card>
+      </Container>
+    </>
   );
 }
 

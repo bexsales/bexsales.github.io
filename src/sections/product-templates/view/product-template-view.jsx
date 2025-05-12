@@ -8,10 +8,8 @@ import { useRef, useState, useEffect } from 'react';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
-import TableRow from '@mui/material/TableRow';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
@@ -79,6 +77,7 @@ export default function ProductTemplateView({
     if (nm) {
       requestUrl += `&name=${nm}`;
     }
+    requestUrl += '&include_images=true';
     console.log(requestUrl);
     axios.get(requestUrl, {
       headers: {
@@ -109,6 +108,9 @@ export default function ProductTemplateView({
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     const numberOfRecords = rowsPerPage * newPage;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     if (numberOfRecords > maxRecord) {
       setMaxRecord(numberOfRecords);
       fetchProducts(newPage, rowsPerPage, products, filterName)
@@ -144,92 +146,104 @@ export default function ProductTemplateView({
   const notFound = !products.length && !!filterName;
 
   return (
-    <Container>
-      {showTitle && ( // Display error message if authError state is not null
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Typography variant="h4">Products</Typography>
+    <>
+      {loading && (
+        <Stack
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            bgcolor: 'rgba(255, 255, 255, 0.6)',
+            zIndex: 2000, // high enough to overlay everything
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <CircularProgress />
         </Stack>
       )}
+      <Container>
+        {showTitle && ( // Display error message if authError state is not null
+          <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+            <Typography variant="h4">Products</Typography>
+          </Stack>
+        )}
 
-      <Card>
-        <ProductTemplateTableToolbar
-          filterName={filterName}
-          onFilterName={handleFilterByName}
-          onClickSearch={handleClickSearch}
-          onHitEnter={handleEnter}
-        />
+        <Card>
+          <ProductTemplateTableToolbar
+            filterName={filterName}
+            onFilterName={handleFilterByName}
+            onClickSearch={handleClickSearch}
+            onHitEnter={handleEnter}
+          />
 
-        <Scrollbar>
-          <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }}>
-              <ProductTemplateTableHead
-                order={order}
-                orderBy={orderBy}
-                rowCount={products.length}
-                onRequestSort={handleSort}
-                headLabel={[
-                  { id: 'name', label: 'Name' },
-                  { id: 'category', label: 'Category' },
-                  { id: 'type', label: 'Type' },
-                  { id: 'lst_price', label: 'Sale Price' }
-                ]}
-              />
-              <TableBody>
-                {loading ? (
-                      <TableRow>
-                        <TableCell colSpan={12} align="center">
-                          <CircularProgress />
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      <>
-                        {products
-                          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                          .map((row) => (
-                            <ProductTemplateTableRow
-                              key={row.id}
-                              id={row.id}
-                              name={row.name}
-                              category={row.categ_id.name}
-                              type={row.type}
-                              list_price={row.list_price}
-                              attributes={row.attribute_line_ids}
-                              onSelect={handleRowSelect}
-                            />
-                          ))}
+          <Scrollbar>
+            <TableContainer sx={{ overflow: 'unset' }}>
+              <Table sx={{ minWidth: 800 }}>
+                <ProductTemplateTableHead
+                  order={order}
+                  orderBy={orderBy}
+                  rowCount={products.length}
+                  onRequestSort={handleSort}
+                  headLabel={[
+                    { id: 'image', label: '\u00A0'.repeat(30) },
+                    { id: 'name', label: 'Name' },
+                    { id: 'category', label: 'Category' },
+                    { id: 'type', label: 'Type' },
+                    { id: 'lst_price', label: 'Sale Price' }
+                  ]}
+                />
+                <TableBody>
+                          {products
+                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            .map((row) => (
+                              <ProductTemplateTableRow
+                                key={row.id}
+                                id={row.id}
+                                image={row.image}
+                                name={row.name}
+                                category={row.categ_id.name}
+                                type={row.type}
+                                list_price={row.list_price}
+                                attributes={row.attribute_line_ids}
+                                onSelect={handleRowSelect}
+                              />
+                            ))}
 
-                        <TableEmptyRows
-                          height={77}
-                          emptyRows={emptyRows(page, rowsPerPage, products.length)}
-                        />
+                          <TableEmptyRows
+                            height={77}
+                            emptyRows={emptyRows(page, rowsPerPage, products.length)}
+                          />
 
-                        {notFound && <TableNoData query={filterName} />}
-                      </>
-                  )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Scrollbar>
+                          {notFound && <TableNoData query={filterName} />}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Scrollbar>
 
-        <TablePagination
-          page={page}
-          component="div"
-          count={totalCount}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[25]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Card>
-      {openProductVariantPopup && (
-        <ProductVariantPopupModal
-          open={openProductVariantPopup}
-          onClose={() => setOpenProductVariantPopup(false)}
-          product={selectedProduct}
-          onSelect={onSelect}
-        />
-      )}
-    </Container>
+          <TablePagination
+            page={page}
+            component="div"
+            count={totalCount}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            rowsPerPageOptions={[25]}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Card>
+        {openProductVariantPopup && (
+          <ProductVariantPopupModal
+            open={openProductVariantPopup}
+            onClose={() => setOpenProductVariantPopup(false)}
+            product={selectedProduct}
+            onSelect={onSelect}
+          />
+        )}
+      </Container>
+    </>
   );
 }
 

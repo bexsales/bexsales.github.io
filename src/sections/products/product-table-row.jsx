@@ -9,6 +9,7 @@ import TableCell from '@mui/material/TableCell';
 export default function ProductTableRow({
   id,
   default_code,
+  image,
   name,
   category,
   type,
@@ -26,6 +27,7 @@ export default function ProductTableRow({
     <TableRow hover tabIndex={-1} onClick={() => onSelect({
       id, 
       default_code,
+      image,
       name,
       category,
       type,
@@ -37,6 +39,15 @@ export default function ProductTableRow({
     })}>
 
       <TableCell>{default_code}</TableCell>
+      <TableCell>
+        {image && (
+          <img
+            src={`data:image/png;base64,${image}`}
+            alt={name}
+            style={{ width: '100px', height: '100px' }}
+          />
+        )}
+      </TableCell>
       <TableCell>{name}</TableCell>
       <TableCell>{category}</TableCell>
       <TableCell>{type}</TableCell>
@@ -56,12 +67,15 @@ export default function ProductTableRow({
 ProductTableRow.propTypes = {
   id: PropTypes.any,
   default_code: PropTypes.any,
+  image: PropTypes.any,
   name: PropTypes.any,
   category: PropTypes.any,
   type: PropTypes.any,
   lst_price: PropTypes.any,
   description_sale: PropTypes.any,
-  attributes: PropTypes.arrayOf(PropTypes.string),
+  attributes: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string
+  })),
   virtual_available: PropTypes.any,
   qty_available: PropTypes.any,
   onSelect: PropTypes.func,

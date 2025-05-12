@@ -59,7 +59,7 @@ export default function ProductVariantPopupModal({
     if (attributes){
         requestUrl += `&attributes=${attributes}`
     }
-
+    requestUrl += '&include_images=true';
     console.log(requestUrl);
 
     axios
@@ -237,6 +237,7 @@ export default function ProductVariantPopupModal({
               <Table>
                 <TableHead>
                   <TableRow>
+                    <TableCell>{ '\u00A0'.repeat(30) }</TableCell>
                     <TableCell>Product</TableCell>
                     <TableCell>Attributes</TableCell>
                     <TableCell>Qty Available</TableCell>
@@ -247,6 +248,15 @@ export default function ProductVariantPopupModal({
                 <TableBody>
                   {selectedProducts.map((_product) => (
                     <TableRow key={_product.id}>
+                      <TableCell>
+                        {_product.image && (
+                          <img
+                            src={`data:image/png;base64,${_product.image}`}
+                            alt={_product.name}
+                            style={{ width: '100px', height: '100px' }}
+                          />
+                        )}
+                      </TableCell>
                       <TableCell>{_product.default_code ? `[${_product.default_code}] ` : ''}{_product.name}</TableCell>
                       <TableCell>{_product.product_template_attribute_value_ids?.map((attr) => (
                           <Chip key={attr.id} label={attr.name} size="small" />

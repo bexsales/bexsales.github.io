@@ -8,10 +8,8 @@ import { useRef, useState, useEffect } from 'react';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
-import TableRow from '@mui/material/TableRow';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
@@ -74,6 +72,9 @@ export default function ProductView({
     if (nm) {
       requestUrl += `&name=${nm}`;
     }
+    
+    requestUrl += '&include_images=true';
+
     console.log(requestUrl);
     axios.get(requestUrl, {
       headers: {
@@ -104,6 +105,9 @@ export default function ProductView({
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     const numberOfRecords = rowsPerPage * newPage;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     if (numberOfRecords > maxRecord) {
       setMaxRecord(numberOfRecords);
       fetchProducts(newPage, rowsPerPage, products, filterName)
@@ -134,92 +138,104 @@ export default function ProductView({
   const notFound = !products.length && !!filterName;
 
   return (
-    <Container>
-      {showTitle && ( // Display error message if authError state is not null
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Typography variant="h4">Products</Typography>
+    <>
+      {loading && (
+        <Stack
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            bgcolor: 'rgba(255, 255, 255, 0.6)',
+            zIndex: 2000, // high enough to overlay everything
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <CircularProgress />
         </Stack>
       )}
+      <Container>
+        {showTitle && ( // Display error message if authError state is not null
+          <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+            <Typography variant="h4">Products</Typography>
+          </Stack>
+        )}
 
-      <Card>
-        <ProductTableToolbar
-          filterName={filterName}
-          onFilterName={handleFilterByName}
-          onClickSearch={handleClickSearch}
-          onHitEnter={handleEnter}
-        />
+        <Card>
+          <ProductTableToolbar
+            filterName={filterName}
+            onFilterName={handleFilterByName}
+            onClickSearch={handleClickSearch}
+            onHitEnter={handleEnter}
+          />
 
-        <Scrollbar>
-          <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }}>
-              <ProductTableHead
-                order={order}
-                orderBy={orderBy}
-                rowCount={products.length}
-                onRequestSort={handleSort}
-                headLabel={[
-                  { id: 'default_code', label: 'Default Code' },
-                  { id: 'name', label: 'Name' },
-                  { id: 'category', label: 'Category' },
-                  { id: 'type', label: 'Type' },
-                  { id: 'lst_price', label: 'Sale Price' },
-                  { id: 'description_sale', label: 'Description' },
-                  { id: 'attributes', label: 'Attributes' },
-                  { id: 'qty_available', label: 'Quantity on Hand' }
-                ]}
-              />
-              <TableBody>
-                {loading ? (
-                    <TableRow>
-                      <TableCell colSpan={12} align="center">
-                        <CircularProgress />
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    <>
-                      {products
-                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                        .map((row) => (
-                          <ProductTableRow
-                            key={row.id}
-                            id={row.id}
-                            default_code={row.default_code}
-                            name={row.name}
-                            category={row.categ_id.name}
-                            type={row.type}
-                            lst_price={row.lst_price}
-                            description_sale={row.description_sale}
-                            attributes={row.product_template_attribute_value_ids}
-                            virtual_available={row.virtual_available}
-                            qty_available={row.qty_available}
-                            onSelect={onSelect}
-                          />
-                        ))}
+          <Scrollbar>
+            <TableContainer sx={{ overflow: 'unset' }}>
+              <Table sx={{ minWidth: 800 }}>
+                <ProductTableHead
+                  order={order}
+                  orderBy={orderBy}
+                  rowCount={products.length}
+                  onRequestSort={handleSort}
+                  headLabel={[
+                    { id: 'default_code', label: 'Default Code' },
+                    { id: 'image', label: '\u00A0'.repeat(30) },
+                    { id: 'name', label: 'Name' },
+                    { id: 'category', label: 'Category' },
+                    { id: 'type', label: 'Type' },
+                    { id: 'lst_price', label: 'Sale Price' },
+                    { id: 'description_sale', label: 'Description' },
+                    { id: 'attributes', label: 'Attributes' },
+                    { id: 'qty_available', label: 'Quantity on Hand' }
+                  ]}
+                />
+                <TableBody>
+                        {products
+                          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                          .map((row) => (
+                            <ProductTableRow
+                              key={row.id}
+                              id={row.id}
+                              default_code={row.default_code}
+                              image={row.image}
+                              name={row.name}
+                              category={row.categ_id.name}
+                              type={row.type}
+                              lst_price={row.lst_price}
+                              description_sale={row.description_sale}
+                              attributes={row.product_template_attribute_value_ids}
+                              virtual_available={row.virtual_available}
+                              qty_available={row.qty_available}
+                              onSelect={onSelect}
+                            />
+                          ))}
 
-                      <TableEmptyRows
-                        height={77}
-                        emptyRows={emptyRows(page, rowsPerPage, products.length)}
-                      />
+                        <TableEmptyRows
+                          height={77}
+                          emptyRows={emptyRows(page, rowsPerPage, products.length)}
+                        />
 
-                      {notFound && <TableNoData query={filterName} />}
-                  </>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Scrollbar>
+                        {notFound && <TableNoData query={filterName} />}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Scrollbar>
 
-        <TablePagination
-          page={page}
-          component="div"
-          count={totalCount}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[25]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Card>
-    </Container>
+          <TablePagination
+            page={page}
+            component="div"
+            count={totalCount}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            rowsPerPageOptions={[25]}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Card>
+      </Container>
+    </>
   );
 }
 

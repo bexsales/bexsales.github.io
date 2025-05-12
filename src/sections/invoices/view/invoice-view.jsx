@@ -8,10 +8,12 @@ import { useRef, useState, useEffect } from 'react';
 
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
+import Stack from '@mui/material/Stack';
 import Container from '@mui/material/Container';
 import TableBody from '@mui/material/TableBody';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import Scrollbar from 'src/components/scrollbar';
 
@@ -27,6 +29,8 @@ import InvoiceTableToolbar from '../invoice-table-toolbar';
 export default function InvoiceView({ invoiceOrigin }) {
 
   const _invoiceOrigin = invoiceOrigin;
+
+  const [loading, setLoading] = useState(false);
 
   const [invoices, setInvoices] = useState([]);
 
@@ -60,7 +64,8 @@ export default function InvoiceView({ invoiceOrigin }) {
   }, []);
 
   const fetchInvoices = (pg, lm, inv, nm, org) => {
-    console.log('Fetching Invoices')
+    console.log('Fetching Invoices');
+    setLoading(true);
     const normalizedPageNumber = pg + 1;
     let requestUrl = `${config.baseURL}/api-proxy/proxy?method=get&resource=invoices&page=${normalizedPageNumber}&page_size=${lm}`
     if (nm) {
@@ -82,6 +87,9 @@ export default function InvoiceView({ invoiceOrigin }) {
     })
     .catch(error => {
       console.error('Error fetching invoices:', error);
+    })
+    .finally(() => {
+      setLoading(false);
     });
   };
 
@@ -96,6 +104,9 @@ export default function InvoiceView({ invoiceOrigin }) {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     const numberOfRecords = rowsPerPage * newPage;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     if (numberOfRecords > maxRecord) {
       setMaxRecord(numberOfRecords);
       fetchInvoices(newPage, rowsPerPage, invoices, filterName, _invoiceOrigin);
@@ -161,82 +172,102 @@ export default function InvoiceView({ invoiceOrigin }) {
   const notFound = !invoices.length && !!filterName;
 
   return (
-    <Container>
-      <Card>
-        <InvoiceTableToolbar
-          filterName={filterName}
-          onFilterName={handleFilterByName}
-          onClickSearch={handleClickSearch}
-          onHitEnter={handleEnter}
-        />
+    <>
+      {loading && (
+        <Stack
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            bgcolor: 'rgba(255, 255, 255, 0.6)',
+            zIndex: 2000, // high enough to overlay everything
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <CircularProgress />
+        </Stack>
+      )}
+      <Container>
+        <Card>
+          <InvoiceTableToolbar
+            filterName={filterName}
+            onFilterName={handleFilterByName}
+            onClickSearch={handleClickSearch}
+            onHitEnter={handleEnter}
+          />
 
-        <Scrollbar>
-          <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }}>
-              <InvoiceTableHead
-                order={order}
-                orderBy={orderBy}
-                rowCount={invoices.length}
-                onRequestSort={handleSort}
-                headLabel={[
-                  { id: 'email_action', label: ''},
-                  { id: 'name', label: 'Name' },
-                  { id: 'payment_state', label: 'Payment State' },
-                  { id: 'customer', label: 'Customer' },
-                  { id: 'customer_email', label: 'Email' },
-                  { id: 'create_date', label: 'Create Date' },
-                  { id: 'amount_untaxed', label: 'Amount Untaxed' },
-                  { id: 'amount_tax', label: 'Amount Tax' },
-                  { id: 'amount_total', label: 'Amount Total' },
-                  { id: 'state', label: 'State' },
-                  { id: 'invoice_origin', label: 'Order' },
-                  { id: 'invoice_Date', label: 'Invoice Date' }
-                ]}
-              />
-              <TableBody>
-                {invoices
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <InvoiceTableRow
-                      key={row.id}
-                      id={row.id}
-                      name={row.name}
-                      payment_state={row.payment_state}
-                      customer={row.customer_id.name}
-                      customer_email={row.customer_id.email}
-                      create_date={row.create_date}
-                      amount_untaxed={row.amount_untaxed}
-                      amount_tax={row.amount_tax}
-                      amount_total={row.amount_total}
-                      state={row.state}
-                      invoice_origin={row.invoice_origin}
-                      invoice_date={row.invoice_date}
-                      handleSendInvoice={(event) => handleSendInvoice(event, row.id)}
-                    />
-                  ))}
-
-                <TableEmptyRows
-                  height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, invoices.length)}
+          <Scrollbar>
+            <TableContainer sx={{ overflow: 'unset' }}>
+              <Table sx={{ minWidth: 800 }}>
+                <InvoiceTableHead
+                  order={order}
+                  orderBy={orderBy}
+                  rowCount={invoices.length}
+                  onRequestSort={handleSort}
+                  headLabel={[
+                    { id: 'email_action', label: ''},
+                    { id: 'name', label: 'Name' },
+                    { id: 'payment_state', label: 'Payment State' },
+                    { id: 'customer', label: 'Customer' },
+                    { id: 'customer_email', label: 'Email' },
+                    { id: 'create_date', label: 'Create Date' },
+                    { id: 'amount_untaxed', label: 'Amount Untaxed' },
+                    { id: 'amount_tax', label: 'Amount Tax' },
+                    { id: 'amount_total', label: 'Amount Total' },
+                    { id: 'state', label: 'State' },
+                    { id: 'invoice_origin', label: 'Order' },
+                    { id: 'invoice_Date', label: 'Invoice Date' }
+                  ]}
                 />
+                <TableBody>
+                  {invoices
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row) => (
+                      <InvoiceTableRow
+                        key={row.id}
+                        id={row.id}
+                        name={row.name}
+                        payment_state={row.payment_state}
+                        customer={row.customer_id.name}
+                        customer_email={row.customer_id.email}
+                        create_date={row.create_date}
+                        amount_untaxed={row.amount_untaxed}
+                        amount_tax={row.amount_tax}
+                        amount_total={row.amount_total}
+                        state={row.state}
+                        invoice_origin={row.invoice_origin}
+                        invoice_date={row.invoice_date}
+                        handleSendInvoice={(event) => handleSendInvoice(event, row.id)}
+                      />
+                    ))}
 
-                {notFound && <TableNoData query={filterName} />}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Scrollbar>
+                  <TableEmptyRows
+                    height={77}
+                    emptyRows={emptyRows(page, rowsPerPage, invoices.length)}
+                  />
 
-        <TablePagination
-          page={page}
-          component="div"
-          count={totalCount}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[25]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Card>
-    </Container>
+                  {notFound && <TableNoData query={filterName} />}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Scrollbar>
+
+          <TablePagination
+            page={page}
+            component="div"
+            count={totalCount}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            rowsPerPageOptions={[25]}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Card>
+      </Container>
+    </>
   );
 }
 
