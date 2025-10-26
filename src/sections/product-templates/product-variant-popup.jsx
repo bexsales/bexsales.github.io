@@ -39,6 +39,53 @@ export default function ProductVariantPopupModal({
   const [variantInfo, setVariantInfo] = useState('...');
   const [selectedProducts, setSelectedProducts] = useState([]);
 
+  // 1️⃣ Add near top
+  const [availableVariants, setAvailableVariants] = useState([]);
+
+  // 2️⃣ Fetch all variants when popup opens
+  useEffect(() => {
+    if (open && product?.id) {
+      const requestUrl = `${config.baseURL}/api-proxy/proxy?method=get&resource=products&template_id=${product.id}&include_images=false&page_size=99999`;
+      axios
+        .get(requestUrl, {
+          headers: { Authorization: `Bearer ${Cookies.get('jwt')}` },
+        })
+        .then((response) => {
+          console.log('Fetched product variants:', response.data.data);
+          const variants = Array.isArray(response.data.data)
+            ? response.data.data
+            : [response.data.data];
+          setAvailableVariants(variants);
+        })
+        .catch((error) => console.error('Error fetching variants:', error));
+    }
+  }, [open, product?.id]);
+
+  // 3️⃣ Add helper function
+  const isValueAvailable = useCallback(
+    (attributeName, valueLabel) => {
+      // Gather currently selected attributes, except the one we're checking
+      const otherSelections = { ...selectedAttributes };
+      delete otherSelections[attributeName];
+
+      // Find variants that match all currently selected attributes
+      const matchingVariants = availableVariants.filter((variant) => {
+        const variantAttrs = variant.product_template_attribute_value_ids.map((a) => a.name);
+        return Object.values(otherSelections).every((val) => variantAttrs.includes(val));
+      });
+
+      // Among those variants, see if any include this value
+      return matchingVariants.some(
+        (variant) => {
+          const attrs = variant.product_template_attribute_value_ids.map((a) => a.name);
+          return attrs.includes(valueLabel) && variant.qty_available > 0;
+        }
+      );
+    },
+    [availableVariants, selectedAttributes]
+  );
+
+
   const handleDeleteProduct = (id) => {
     setSelectedProducts((prev) => prev.filter((p) => p.id !== id));
   };
@@ -198,26 +245,33 @@ export default function ProductVariantPopupModal({
                 borderRadius: 1,
               }}
             >
-              {attr.values.map((value, index) => (
-                <Chip
-                  key={index}
-                  label={value[1]}
-                  clickable
-                  color={
-                    selectedAttributes[attr.attribute] === value[1]
-                      ? 'primary'
-                      : 'default'
-                  }
-                  onClick={() => handleAttributeSelect(attr.attribute, value[1])}
-                  sx={{
-                    borderRadius: '5px',
-                    fontWeight:
+              {attr.values.map((value, index) => {
+                const available = isValueAvailable(attr.attribute, value[1]);
+                return (
+                  <Chip
+                    key={index}
+                    label={value[1]}
+                    clickable={available}
+                    color={
                       selectedAttributes[attr.attribute] === value[1]
-                        ? 'bold'
-                        : 'normal',
-                  }}
-                />
-              ))}
+                        ? 'primary'
+                        : 'default'
+                    }
+                    onClick={() =>
+                      available && handleAttributeSelect(attr.attribute, value[1])
+                    }
+                    disabled={!available}
+                    sx={{
+                      borderRadius: '5px',
+                      fontWeight:
+                        selectedAttributes[attr.attribute] === value[1]
+                          ? 'bold'
+                          : 'normal',
+                      opacity: available ? 1 : 0.4,
+                    }}
+                  />
+                );
+              })}
             </Box>
           </Stack>
         ))}
