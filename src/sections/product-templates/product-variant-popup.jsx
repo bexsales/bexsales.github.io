@@ -45,12 +45,13 @@ export default function ProductVariantPopupModal({
   // 2️⃣ Fetch all variants when popup opens
   useEffect(() => {
     if (open && product?.id) {
-      const requestUrl = `${config.baseURL}/api-proxy/proxy?method=get&resource=products&template_id=${product.id}&include_images=true`;
+      const requestUrl = `${config.baseURL}/api-proxy/proxy?method=get&resource=products&template_id=${product.id}&include_images=false&page_size=99999`;
       axios
         .get(requestUrl, {
           headers: { Authorization: `Bearer ${Cookies.get('jwt')}` },
         })
         .then((response) => {
+          console.log('Fetched product variants:', response.data.data);
           const variants = Array.isArray(response.data.data)
             ? response.data.data
             : [response.data.data];
