@@ -206,6 +206,8 @@ export default function CustomerView({
                     { id: 'phone', label: 'Phone' },
                     { id: 'mobile', label: 'Mobile' },
                     { id: 'email', label: 'Email' },
+                    { id: 'is_brick_and_mortar', label: 'Brick and Mortar' },
+                    { id: 'is_sells_at_roadshows', label: 'Sells at Roadshows' }
                   ]}
                 />
                 <TableBody>
@@ -224,6 +226,8 @@ export default function CustomerView({
                                 phone={row.phone}
                                 mobile={row.mobile}
                                 email={row.email}
+                                is_brick_and_mortar={row.is_brick_and_mortar}
+                                is_sells_at_roadshows={row.is_sells_at_roadshows}
                                 onSelect={onSelect}
                               />
                             ))}
