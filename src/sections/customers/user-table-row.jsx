@@ -16,6 +16,8 @@ export default function UserTableRow({
   phone,
   mobile,
   email,
+  is_brick_and_mortar,
+  is_sells_at_roadshows,
   onSelect,
 }) {
 
@@ -30,7 +32,9 @@ export default function UserTableRow({
       zip,
       phone,
       mobile,
-      email
+      email,
+      is_brick_and_mortar,
+      is_sells_at_roadshows
     })}>
 
       <TableCell>{name}</TableCell>
@@ -42,7 +46,8 @@ export default function UserTableRow({
       <TableCell>{phone}</TableCell>
       <TableCell>{mobile}</TableCell>
       <TableCell>{email}</TableCell>
-
+      <TableCell>{is_brick_and_mortar ? 'Yes' : 'No'}</TableCell>
+      <TableCell>{is_sells_at_roadshows ? 'Yes' : 'No'}</TableCell>
     </TableRow>
   );
 }
@@ -58,5 +63,7 @@ UserTableRow.propTypes = {
   phone: PropTypes.any,
   mobile: PropTypes.any,
   email: PropTypes.any,
+  is_brick_and_mortar: PropTypes.bool,
+  is_sells_at_roadshows: PropTypes.bool,
   onSelect: PropTypes.func,
 };
