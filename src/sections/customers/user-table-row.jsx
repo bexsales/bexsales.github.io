@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
@@ -21,8 +22,18 @@ export default function UserTableRow({
   onSelect,
 }) {
 
+  const navigate = useNavigate();
+
+  const defaultSelect = (customer) => {
+    console.log(  'Navigating to customer', customer);
+    navigate(`/customers/${customer.id}`);
+  };
+
+  // eslint wants this version instead of the ternary
+  const handleSelect = onSelect || defaultSelect;
+
   return (
-    <TableRow hover tabIndex={-1} onClick={() => onSelect({
+    <TableRow hover tabIndex={-1} onClick={() => handleSelect({
       id, 
       name,
       street,
