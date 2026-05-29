@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Slide from '@mui/material/Slide';
 import Input from '@mui/material/Input';
@@ -40,7 +41,9 @@ const StyledSearchbar = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function Searchbar() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
 
   const handleOpen = () => {
     setOpen(!open);
@@ -48,6 +51,20 @@ export default function Searchbar() {
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleSearch = () => {
+    if (query.trim()) {
+      navigate(`/search?q=${encodeURIComponent(query)}`);
+      setQuery('');
+      handleClose();
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
@@ -66,6 +83,9 @@ export default function Searchbar() {
               fullWidth
               disableUnderline
               placeholder="Search…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
               startAdornment={
                 <InputAdornment position="start">
                   <Iconify
@@ -76,7 +96,7 @@ export default function Searchbar() {
               }
               sx={{ mr: 1, fontWeight: 'fontWeightBold' }}
             />
-            <Button variant="contained" onClick={handleClose}>
+            <Button variant="contained" onClick={handleSearch}>
               Search
             </Button>
           </StyledSearchbar>
