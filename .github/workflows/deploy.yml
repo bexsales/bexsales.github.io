@@ -40,3 +40,4 @@ jobs:
           yarn deploy
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
