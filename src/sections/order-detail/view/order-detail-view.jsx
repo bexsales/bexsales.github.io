@@ -430,8 +430,8 @@ export default function OrderDetailView({
           <div style={{ margin: '16px 0' }} />
           <Typography variant="body1" fontWeight="bold">Address:</Typography>
           <Typography variant="body1">{delivery.street}</Typography>
-          <Typography variant="body1">{delivery.city} {partner.state}</Typography>
-          <Typography variant="body1">{delivery.country} {partner.zip}</Typography>
+          <Typography variant="body1">{delivery.city} {delivery.state}</Typography>
+          <Typography variant="body1">{delivery.country} {delivery.zip}</Typography>
           <Typography variant="body1"><b>Phone:</b> {delivery.phone}</Typography>
           <Typography variant="body1"><b>Mobile:</b> {delivery.mobile}</Typography>
           <Typography variant="body1"><b>Email:</b> {delivery.email}</Typography>
